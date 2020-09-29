@@ -383,25 +383,10 @@
 			ctx.drawImage(bgd[bgdnum], 0, 0, 1500, 800)
 			//ctx.drawImage(bgd[bgdnum], 0, 118, 0, 0, 400, 1500, 400)
 
-			ctx.fillStyle = "white";
-			ctx.font = (40) + "px Arial";
-			ctx.fillText(fighters[0].health, 50, 50);
-
-			ctx.fillStyle = "white";
-			ctx.font = (30) + "px Arial";
-			ctx.fillText(fighters[0].specialmeter, 60, 100);
-
-			ctx.fillStyle = "white";
-			ctx.font = (40) + "px Arial";
-			ctx.fillText(fighters[1].health, 1400, 50);
-
-			ctx.fillStyle = "white";
-			ctx.font = (30) + "px Arial";
-			ctx.fillText(fighters[1].specialmeter, 1410, 100);
 
 			//ctx.drawImage(background, 0, 0, 1500, 800)
 
-
+			drawbars();
 
 			drawfighter.call(fighters[0]);
 			drawfighter.call(fighters[1]);
@@ -482,7 +467,6 @@
 
 
 			checkhealth();
-			drawbars();
 
 			if (youwin == 1) {
 				theme.currentTime = 100;
@@ -897,6 +881,26 @@
 
 		function waitingforplay() {
 
+
+		}
+
+		function drawbars() {
+
+			ctx.fillStyle = "white";
+			ctx.font = (40) + "px Arial";
+			ctx.fillText(fighters[0].health, 50, 50);
+
+			ctx.fillStyle = "white";
+			ctx.font = (30) + "px Arial";
+			ctx.fillText(fighters[0].specialmeter, 60, 100);
+
+			ctx.fillStyle = "white";
+			ctx.font = (40) + "px Arial";
+			ctx.fillText(fighters[1].health, 1400, 50);
+
+			ctx.fillStyle = "white";
+			ctx.font = (30) + "px Arial";
+			ctx.fillText(fighters[1].specialmeter, 1410, 100);
 
 		}
 
