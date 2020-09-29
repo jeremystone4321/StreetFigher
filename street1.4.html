@@ -84,6 +84,7 @@
 					this.specialspinkick = 0;
 					this.specialfireballs = 0;
 					this.specialmeter = 0;
+					this.wins = 0;
 
 				}
 
@@ -151,6 +152,7 @@
 					this.specialspinkick = 0;
 					this.specialfireballs = 0;
 					this.specialmeter = 0;
+					this.wins = 0;
 
 				}
  
@@ -311,12 +313,21 @@
 		var spinkickfx = new Audio("sfx/7.mp3");
 		var gamestartfx = new Audio("sfx/game start.wav");
 		var roundsfx = new Audio("sfx/round.mp3");
-		var numonefx = new Audio("sfx/num 1.mp3");
+		var numonefx = new Audio("sfx/num1.mp3");
+		var numtwofx = new Audio("sfx/num2.mp3");
+		var numthreefx = new Audio("sfx/num3.mp3");
 		var fightfx = new Audio("sfx/fight.mp3");
 		var youwinfx = new Audio("sfx/youwin.mp3");
 		var youlosefx = new Audio("sfx/youlose.mp3");
+		var finalfx = new Audio("sfx/final.mp3");
+		var loserfx = new Audio("sfx/loserfx.wav");
+		var winnerfx = new Audio("sfx/winnerfx.wav");
 
 
+		var ryulosescreen = new Image();
+		ryulosescreen.src = "ryulose.gif";
+		var ryuwinscreen = new Image();
+		ryuwinscreen.src = "evilryuwin.gif";
 
 		function playmusic() {
 			theme.play();
@@ -334,6 +345,9 @@
 		var gamestart = 0;
 
 		var youwin = 0;
+		var round = 0;
+		var winone = 0;
+		var wintwo = 0;
 
 		//background.src = "/bgd/frame_0" + x + "_delay-0.2s.gif";
 		//background.src = "bgd/frame_00_delay-0.2s.gif";
@@ -402,7 +416,21 @@
 			//console.log(fighters[0].spins)
 
 			if (gamestart == 3) {
-				roundsfx.play();
+				if (fighters[0].wins == 2) {
+					drawwinscreen();
+					return;
+				}
+				if (fighters[1].wins == 2) {
+					drawlosescreen();
+					return;
+				}
+				if (round == 3) {
+					finalfx.play()
+				}
+				else {
+					roundsfx.play();
+				}
+				
 				gamestart = 4;
 				return;
 			}
@@ -411,10 +439,12 @@
 
 				ctx.fillStyle = "orange";
 				ctx.font = (180) + "px Comic Sans";
-				ctx.fillText("Round 1", 400, 400);
+				ctx.fillText("Round "+round, 400, 400);
 
-				if (roundsfx.currentTime > 0.9) {
-					numonefx.play();
+				if ((roundsfx.currentTime > 0.9 && round < 3) || (round == 3 && finalfx.currentTime>0.8)) {
+					if (round == 1) { numonefx.play(); }
+					if (round == 2) { numtwofx.play(); }
+					if (round == 3) { roundsfx.play(); }
 					gamestart = 5;
 					return;
 				}
@@ -425,9 +455,11 @@
 
 				ctx.fillStyle = "orange";
 				ctx.font = (180) + "px Comic Sans";
-				ctx.fillText("Round 1", 400, 400);
+				ctx.fillText("Round "+round, 400, 400);
 
-				if (numonefx.currentTime > 0.45) {
+				if ((round == 1 && numonefx.currentTime > 0.45) ||
+					(round == 2 && numtwofx.currentTime > 0.45) ||
+					(round == 3 && roundsfx.currentTime > 0.9) ) {
 					fightfx.play()
 					gamestart = 6;
 					return;
@@ -456,6 +488,7 @@
 				flairflop.call(fighters[1]);
 				idlefighter.call(fighters[0]);
 				youwin = 2;
+				fighters[0].wins++;
 
 				return;
 			}
@@ -474,10 +507,14 @@
 				}
 
 				if (theme.currentTime > 105) {
+					if (fighters[0].wins == 2) {
+						winnerfx.play();
+					}
 					youwin = 0;
 					idlefighter.call(fighters[0]);
 					idlefighter.call(fighters[1]);
 					initpositions();
+					round++;
 					gamestart = 2;
 				}
 				return;
@@ -489,6 +526,7 @@
 				flairflop.call(fighters[0]);
 				idlefighter.call(fighters[1]);
 				youwin = -2;
+				fighters[1].wins++;
 
 				return;
 			}
@@ -507,10 +545,14 @@
 				}
 
 				if (theme.currentTime > 105) {
+					if (fighters[1].wins == 2) {
+						loserfx.play();
+					}
 					youwin = 0;
 					idlefighter.call(fighters[0]);
 					idlefighter.call(fighters[1]);
 					initpositions();
+					round++;
 					gamestart = 2;
 				}
 				return;
@@ -581,6 +623,7 @@
 				fighters[0].stunned = 1;
 				waitingforplay();
 				fighters[1].ypos = -800;
+				round = 1;
 				return
 			}
 
@@ -701,13 +744,16 @@
 				m.aimode = Math.floor(Math.random() * 10);
 				if (this.specialfireballs == 0) { m.aimove = Math.floor(Math.random() * 2); }
 				this.blocking = 0;
+				this.crouch = 0;
 				if (this.jump == 0 && this.stunned == 0 && this.spins==0) { idlefighter.call(this); }
 				//console.log(aimode);
 			}
 			//m.aimode = 4;
 			//m.aimove = 4;
 
-			if (this.specialmeter > 149 && this.specialtimer>0  && Math.random() * 100 > 70) {
+			if (this.specialmeter > 149 && this.specialtimer > 0 && Math.random() * 100 > 70) {
+				this.blocking = 0;
+				this.crouch = 0;
 				m.aimode = 9;
 			}
 
@@ -832,11 +878,16 @@
 				gamestartfx.readyState == 4 &&
 				roundsfx.readyState == 4 &&
 				numonefx.readyState == 4 &&
+				numtwofx.readyState == 4 &&
+				numthreefx.readyState == 4 &&
 				fightfx.readyState == 4 &&
 				youwinfx.readyState == 4 &&
 				youlosefx.readyState == 4 &&
+				loserfx.readyState == 4 &&
+				finalfx.readyState == 4 &&
+				winnerfx.readyState == 4 &&
 				loadingtimer > 240) {
-
+				console.log(loadingtimer)
 				gameready = 1;
 			}
 
@@ -845,6 +896,14 @@
 		function waitingforplay() {
 
 
+		}
+
+		function drawwinscreen() {
+			ctx.drawImage(ryuwinscreen, 0, 0, 1500, 800)
+		}
+
+		function drawlosescreen() {
+			ctx.drawImage(ryulosescreen, 0, 0, 1500, 800)
 		}
 
 		function checkhealth() {
@@ -1183,6 +1242,7 @@
 			this.health--;
 			this.specialtimer + 60;
 			this.specialmeter += 5;
+			this.specialfireballs = 0;
 			if (fighters[0] !== this) {
 				fighters[0].specialmeter += 5;
 			}
@@ -1289,6 +1349,12 @@
 		function jumping() {
 
 			this.ypos -= 6 * this.jump;
+
+			if (this.ypos < 6 && gamestart==7) {
+				this.ypos = 0;
+				this.jump == -1;
+			}
+
 
 			if (this.jump == 1 && this.ypos == this.jumpheight) {
 
@@ -2033,12 +2099,12 @@
 			if (this.xpos < 10) {
 				this.xpos = 10;
 			}
-			if (this.spins > 0) {
-				if (this.xpos > 1290) {
-					this.xpos = 1280;
+			if (this.spins > 0 && this.jump!==0) {
+				if (this.xpos > 1255) {
+					this.xpos = 1240;
 				}
 				if (this.xpos < 0) {
-					this.xpos = 20;
+					this.xpos = 40;
 				}
 			}
 		}
