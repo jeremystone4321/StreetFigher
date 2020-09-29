@@ -482,6 +482,7 @@
 
 
 			checkhealth();
+			drawbars();
 
 			if (youwin == 1) {
 				theme.currentTime = 100;
@@ -2387,6 +2388,15 @@
 
 		}
 
+		document.addEventListener("touchstart", touchstart);
+
+		function touchstart(e) {
+
+			if (fighters[1].ypos == -800) {
+				gamestart = 1;
+			}
+
+		}
 
 
 		//drawFight();
