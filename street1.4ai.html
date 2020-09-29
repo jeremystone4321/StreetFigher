@@ -323,11 +323,23 @@
 		var loserfx = new Audio("sfx/loserfx.wav");
 		var winnerfx = new Audio("sfx/winnerfx.wav");
 
-
+		var redbar = new Image();
+		redbar.src = "redbar.png";
+		var greenbar = new Image();
+		greenbar.src = "greenbar.png";
+		var bluebar = new Image();
+		bluebar.src = "bluebar.png";
+		var brightbluebar = new Image();
+		brightbluebar.src = "brightblue.png";
+		var blackbar = new Image();
+		blackbar.src = "blackbar.png";
 		var ryulosescreen = new Image();
 		ryulosescreen.src = "ryulose.gif";
 		var ryuwinscreen = new Image();
 		ryuwinscreen.src = "evilryuwin.gif";
+		var yellowcircle = new Image();
+		yellowcircle.src = "yellowcirc.png";
+
 
 		function playmusic() {
 			theme.play();
@@ -886,6 +898,7 @@
 
 		function drawbars() {
 
+			/*
 			ctx.fillStyle = "white";
 			ctx.font = (40) + "px Arial";
 			ctx.fillText(fighters[0].health, 50, 50);
@@ -901,6 +914,74 @@
 			ctx.fillStyle = "white";
 			ctx.font = (30) + "px Arial";
 			ctx.fillText(fighters[1].specialmeter, 1410, 100);
+			*/
+			var y;
+
+			y = Math.floor(fighters[0].specialmeter / 150);
+
+			ctx.drawImage(redbar, 50, 50, 600, 50);
+			ctx.drawImage(greenbar, 50, 50, fighters[0].health * 3, 50);
+
+			for (x = 0; x <= y; x++) {
+				if (x > 3) {
+					continue;
+				}
+				ctx.drawImage(blackbar, 50 + 145+(x*150), 100, 10, 25);
+			}
+
+			v = fighters[0].specialmeter * 1.2;
+			if (v > 600) { v = 600; }
+			ctx.drawImage(bluebar, 50, 100, v, 25);
+			
+			
+			if (fighters[0].specialmeter > 149) {
+				for (x = 0; x < y; x++) {
+					if (x > 3) {
+						continue;
+					}
+					ctx.drawImage(brightbluebar, 50+(150*x), 100, 150 * 1.2, 25);
+				}
+			}
+
+			if (fighters[0].wins >0) {
+				ctx.drawImage(yellowcircle, 50, 130, 25, 25);
+			}
+
+			if (fighters[0].wins == 2) {
+				ctx.drawImage(yellowcircle, 75, 130, 25, 25);
+			}
+
+
+			y = Math.floor(fighters[1].specialmeter / 150);
+
+			ctx.drawImage(redbar, 850, 50, 600, 50);
+			ctx.drawImage(greenbar, 850, 50, fighters[1].health * 3, 50);
+
+
+			for (x = 0; x <= y; x++) {
+				if (x > 3) {
+					continue;
+				}
+				ctx.drawImage(blackbar, 850 + 145 + (x * 150), 100, 10, 25);
+			}
+			ctx.drawImage(bluebar, 850, 100, fighters[1].specialmeter * 1.2, 25);
+
+			if (fighters[1].specialmeter > 149) {
+				for (x = 0; x < y; x++) {
+					if (x > 3) {
+						continue;
+					}
+					ctx.drawImage(brightbluebar, 850 + (150 * x), 100, 150 * 1.2, 25);
+				}
+			}
+
+			if (fighters[1].wins > 0) {
+				ctx.drawImage(yellowcircle, 1425, 130, 25, 25);
+			}
+
+			if (fighters[1].wins == 2) {
+				ctx.drawImage(yellowcircle, 1400, 130, 25, 25);
+			}
 
 		}
 
@@ -1358,8 +1439,9 @@
 
 			if (this.ypos < 6 && gamestart==7) {
 				this.ypos = 0;
-				this.jump == -1;
+				this.jump = -1;
 			}
+
 
 
 			if (this.jump == 1 && this.ypos == this.jumpheight) {
