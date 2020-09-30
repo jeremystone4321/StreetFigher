@@ -152,6 +152,16 @@
 					this.specialmeter = 0;
 					this.wins = 0;
 
+					this.buttonpress = 0;
+					this.moveleftright = 0;
+
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+					this.controllertimer = 0;
+					this.previouspadbutton = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+
 				}
  
 				/*this.dhal = function () {
@@ -297,10 +307,12 @@
 		var combokeynumber = 0;
 		var keypressed = 0;
 		var controllertimer = 0;
-		var previouspadbutton = [
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-			[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-		];
+
+
+		//var previouspadbutton = [
+			//[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			//[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		//];
 		var buttonkeys = [190, 0, 188, 0, 0, 0, 0, 0, 0, 0, 0, 0, 87, 83, 65, 68];
 
 		var buttonused = 0;
@@ -390,12 +402,14 @@
 			//console.log(controller);
 			var controller;
 			var controllerone;
+			var controllertwo;
 
 			controller = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);//navigator.getGamepads();
 
 			controllerone = controller[0];
+			controllertwo = controller[1];
 
-			controllertimer++;
+			fighters[0].controllertimer++;
 
 			//console.log(controllerone.buttons)
 			if (controller !== undefined && controllerone !== null) {
@@ -407,32 +421,7 @@
 
 			if (controller !== undefined && controllerone !== null) {
 				
-				for (var g = 0; g < 16; g++) {
-					if (controllertimer > 8) {
-
-						if (controllerone.buttons[g].pressed == true) {
-
-							//console.log(buttonkeys[g])
-							controllertimer = 0;
-
-							var e = { keyCode: buttonkeys[g] };
-							keyDown(e);
-							previouspadbutton[0][g] = buttonkeys[g];
-						}
-					}
-					if (previouspadbutton[0][g] == buttonkeys[g]) {
-						if (controllerone.buttons[g].pressed == false) {
-							var e = { keyCode: buttonkeys[g] };
-							keyUp(e);
-							//console.log("hey")
-							previouspadbutton[0][g] = 0;
-
-							if (g == 14) {
-								console.log(controllerone.buttons[g].pressed)
-								console.log(previouspadbutton[0][g])
-							}
-						}
-					}
+				controllercheckbutton.call(fighters[0], controllerone);
 				}
 /*
 				if (controller !== undefined && controllerone !== null && controllertimer > 8) {
@@ -451,7 +440,7 @@
 					}
 				}
 				*/
-			}
+			//}
 
 			if (gameready == 0) {
 				loadingtimer++;
@@ -973,6 +962,37 @@
 
 		}
 
+		function controllercheckbutton(m) {
+
+			for (var g = 0; g < 16; g++) {
+				if (this.controllertimer > 6) {
+
+					if (m.buttons[g].pressed == true) {
+
+						//console.log(buttonkeys[g])
+						this.controllertimer = 0;
+
+						var e = { keyCode: buttonkeys[g] };
+						keyDown(e);
+						this.previouspadbutton[g] = buttonkeys[g];
+					}
+				}
+				if (this.previouspadbutton[g] == buttonkeys[g]) {
+					if (m.buttons[g].pressed == false) {
+						var e = { keyCode: buttonkeys[g] };
+						keyUp(e);
+						//console.log("hey")
+						this.previouspadbutton[g] = 0;
+
+						//if (g == 14) {
+						//	console.log(controllerone.buttons[g].pressed)
+						//	console.log(previouspadbutton[0][g])
+						//}
+					}
+				}
+			}
+		}
+
 		function waitingforplay() {
 
 
@@ -1273,20 +1293,20 @@
 					var v = checkcollideotherfire(projectiles[z], z);
 					if (q == true) {
 						projectiles.splice(z, 1);
-						z--;
+						if (z !== projectiles.length - 1) { z--; }
 					}
 					else if (w == true) {
 						projectiles.splice(z, 1);
-						z--;
+						if (z !== projectiles.length - 1) { z--; }
 					}
 					else if (v !== -1) {
 						projectiles.splice(z, 1);
 						projectiles.splice(v - 1, 1);
-						z--;
+						if (z !== projectiles.length - 1) { z--; }
 					}
 					else if (projectiles[z].xpos > 1500 || projectiles[z].xpos < 0) {
 						projectiles.splice(z, 1);
-						z--;
+						if (z !== projectiles.length - 1) { z--; }
 					}///unload from array and minus the z--
 				}
 			}
