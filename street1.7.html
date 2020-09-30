@@ -84,6 +84,17 @@
 					this.specialmeter = 0;
 					this.wins = 0;
 
+					this.buttonpress = 0;
+					this.moveleftright = 0;
+
+					this.rightkeydown = false;
+					this.leftkeydown = false;
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+					this.controllertimer = 0;
+					this.previouspadbutton = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
 				}
 
 
@@ -155,6 +166,8 @@
 					this.buttonpress = 0;
 					this.moveleftright = 0;
 
+					this.rightkeydown = false;
+					this.leftkeydown = false;
 					this.combotimer = 0;
 					this.combokeynumber = 0;
 					this.keypressed = 0;
@@ -250,7 +263,7 @@
 		class aistuff {
 			constructor() {
 				this.simpleaitimer = 0;
-				this.aimode = 0;
+				this.aimode = 99;
 				this.aimove = 0;
 			}
 		}
@@ -628,8 +641,10 @@
 			}
 
 
+			checkbuttonpressed.call(fighters[0]);
 
-			if (fighters[0].spins == 0 && fighters[0].specialfireballs == 0) {
+			/*
+			if (fighters[0].spins == 0 && fighters[0].specialfireballs == 0 && buttonpress!==0) {
 				if (fighters[0].crouch == 0 && buttonpress !== 8) {
 					if (rightkeydown == true) {
 						movefighter.call(fighters[0], 1);
@@ -667,10 +682,13 @@
 					idlefighter.call(fighters[0]);
 					buttonpress = 0;
 				}
+				fighters[0].buttonpress = buttonpress;
+				fighters[0].keypressed = keypressed
+
 			}
+			*/
 
 
-			checkblock.call(fighters[0]);
 
 			timers.call(fighters[0]);
 			timers.call(fighters[1]);
@@ -725,9 +743,10 @@
 
 
 			simpleai.call(fighters[1], ai[1]);
-			simpleai.call(fighters[0], ai[0]);
+			//simpleai.call(fighters[0], ai[0]);
 
-			combomove();
+			combomove.call(fighters[0]);
+
 			spinmoves.call(fighters[0]);
 			spinmoves.call(fighters[1]);
 			specialfire.call(fighters[0]);///////////////////////////
@@ -738,10 +757,17 @@
 			checkcollideeachother(fighters[0], fighters[1]);
 			checkcollideeachother(fighters[1], fighters[0]);
 
-			
+			if (Math.random * 100 > 50) {
 				checkpunch(fighters[0], fighters[1]);
 				checkpunch(fighters[1], fighters[0]);
-			
+			} else {
+				checkpunch(fighters[1], fighters[0]);
+				checkpunch(fighters[0], fighters[1]);
+			}
+
+
+			if (ai[0].aimode == 99) { checkblock.call(fighters[0]); }
+			if (ai[1].aimode == 99) { checkblock.call(fighters[1]); }
 
 
 
@@ -810,7 +836,7 @@
 			//crouchfighter.call(this);
 			//return;
 
-			if (m.simpleaitimer > 0 && this.spins == 0 && this.specialfireballs == 0 && this.stunned==0) {
+			if (m.simpleaitimer > 0 && this.spins == 0 && this.specialfireballs == 0 && this.stunned == 0 && this.stuncounter>0) {
 				m.simpleaitimer = -60;
 				m.aimode = Math.floor(Math.random() * 10);
 				if (this.specialfireballs == 0) { m.aimove = Math.floor(Math.random() * 2); }
@@ -822,7 +848,7 @@
 			//m.aimode = 4;
 			//m.aimove = 4;
 
-			if (this.specialmeter > 149 && this.specialtimer > 0 && Math.random() * 100 > 70) {
+			if (this.specialmeter > 149 && this.specialtimer > 0 && Math.random() * 100 > 70 && this.specialfireballs==0 && this.spins==0) {
 				this.blocking = 0;
 				this.crouch = 0;
 				m.aimode = 9;
@@ -887,6 +913,7 @@
 			if (m.aimode == 9) {
 				if (this.specialmeter > 149 && this.specialtimer>0) {
 
+					
 					if (Math.random() * 100 > 50) {
 						if (this.jump == 0 && this.specialtimer > 0) {
 							smalljumpfighter.call(this);
@@ -897,9 +924,9 @@
 
 					}
 					else {
-						
+					
 						this.specialmeter -= 150;
-						this.specialfireballs = 36;
+						this.specialfireballs = 100;
 						projectfighter.call(this);
 						this.specialtimer = -120;
 						/*
@@ -965,6 +992,55 @@
 
 		}
 
+		function checkbuttonpressed() {
+
+
+			
+
+			if (this.spins == 0 && this.specialfireballs == 0) {
+				if (this.crouch == 0 && this.buttonpress !== 8) {
+					if (this.rightkeydown == true) {
+						movefighter.call(this, 1);
+					}
+					else if (this.leftkeydown == true) {
+						movefighter.call(this, -1);
+					}
+				}
+
+				if (this.buttonpress == 3) {
+					jumpfighter.call(this, 1);
+					this.buttonpress = 0;
+				}
+				else if (this.buttonpress == 8) {
+					this.buttonpress = 0;
+					projectfighter.call(this);
+				}
+				else if (this.buttonpress == 7 && this.jump == 0 && this.crouch==0) {
+					this.buttonpress = 0;
+					crouchfighter.call(this);
+				}
+				else if (this.buttonpress == 6 && this.jump == 0) {
+					this.buttonpress = 0;
+					idlefighter.call(this);
+				}
+				else if (this.buttonpress == 5) {
+					punch.call(this);
+					this.buttonpress = 0;
+				}
+				else if (this.buttonpress == 10) {
+					kick.call(this);
+					this.buttonpress = 0;
+				}
+
+				if (this.buttonpress == 9 && this.jump == 0) {
+					idlefighter.call(this);
+					this.buttonpress = 0;
+				}
+
+			}
+		}
+
+
 		function controllercheckbutton(m) {
 
 			for (var g = 0; g < 16; g++) {
@@ -976,14 +1052,14 @@
 						this.controllertimer = 0;
 
 						var e = { keyCode: buttonkeys[g] };
-						keyDown(e);
+						keysDown.call(this, e);
 						this.previouspadbutton[g] = buttonkeys[g];
 					}
 				}
 				if (this.previouspadbutton[g] == buttonkeys[g]) {
 					if (m.buttons[g].pressed == false) {
 						var e = { keyCode: buttonkeys[g] };
-						keyUp(e);
+						keysUp.call(this, e);
 						//console.log("hey")
 						this.previouspadbutton[g] = 0;
 
@@ -1225,18 +1301,28 @@
 
 		function checkblock() {
 
-			if (this.spins !== 0 && this.specialfireballs !==0) {
+			if (this.directionfacing == 1 && this.leftkeydown == true && this.rightkeydown == false) {
+				this.blocking = 0
+			}
+			if (this.directionfacing == 0 && this.leftkeydown == false && this.rightkeydown == true) {
+				this.blocking = 0;
+			}
+			if (this.leftkeydown == false && this.rightkeydown == false) {
+				this.blocking = 0;
+			}
+
+			if (this.spins !== 0 || this.specialfireballs !== 0 || this.stunned == 1 || this.stuncounter < 0 || this.jump !== 0) {
 				return;
 			}
 
-			if (this.directionfacing == 0 && leftkeydown == true && rightkeydown == false && this.punch == 0) {
+			if (this.directionfacing == 0 && this.leftkeydown == true && this.rightkeydown == false && this.punch == 0) {
 				this.blocking = 1;
 				return;
 			}
 			else {
 				this.blocking = 0;
 			}
-			if (this.directionfacing == 1 && leftkeydown == false && rightkeydown == true && this.punch == 0) {
+			if (this.directionfacing == 1 && this.leftkeydown == false && this.rightkeydown == true && this.punch == 0) {
 				this.blocking = 1;
 			}
 			else {
@@ -1247,7 +1333,7 @@
 
 		function block() {
 
-			if (this.stunned == 0) {
+			if (this.stunned == 0 && this.stuncounter>0) {
 				//blocksfx.play();
 				var snd = new Audio("sfx/2BH (2).mp3");
 				snd.play();
@@ -1858,297 +1944,299 @@
 
 		function combomove() {
 
-			combotimer++;
+			this.combotimer++;
 
-			if (fighters[0].stunned == 1) {
-				combokeynumber = 0;
-				combotimer = 0;
+			if (this.stunned == 1) {
+				this.combokeynumber = 0;
+				this.combotimer = 0;
 				return;
 			}
 
 			const combotimeneeded = 20;
 
-			if (combotimer > combotimeneeded) {
-				combokeynumber = 0;
+			if (this.combotimer > combotimeneeded) {
+				this.combokeynumber = 0;
 			}
 
-			//console.log(combokeynumber);
+			//console.log(this.combokeynumber);
 
-			if (keypressed == 83 && combokeynumber == 0) {
-				combotimer = 0;
-				combokeynumber = 1;
-				keypressed = 0;
+			if (this.keypressed == 83 && this.combokeynumber == 0) {
+				this.combotimer = 0;
+				this.combokeynumber = 1;
+				this.keypressed = 0;
+				console.log("HEY")
 			}
 
 
-			if (fighters[0].directionfacing == 0) {
-				if (keypressed == 68 && combokeynumber == 1 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 2;
-					keypressed = 0;
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 68 && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 2;
+					this.keypressed = 0;
 				}
-				else if ((keypressed == 87 || keypressed == 83) && combokeynumber == 1 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
-				}
-			}
-			if (fighters[0].directionfacing == 1) {
-				if (keypressed == 65 && combokeynumber == 1 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 2;
-					keypressed = 0;
-				}
-				else if ((keypressed == 87 || keypressed == 83) && combokeynumber == 1 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
 				}
 			}
-			if (keypressed == 188 && combokeynumber == 2 && combotimer < combotimeneeded) {
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 65 && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 2;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+			if (this.keypressed == 188 && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
 				buttonpress = 0;
-				combotimer = 0;
-				combokeynumber = 0;
-				projectfighter.call(fighters[0]);
-				keypressed = 0;
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				projectfighter.call(this);
+				this.keypressed = 0;
 			}
 
 
 
-			if (fighters[0].directionfacing == 0) {
-				if (keypressed == 83 && combokeynumber == 2 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 11;
-					keypressed = 0;
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 83 && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 11;
+					this.keypressed = 0;
 				}
-				else if ((keypressed == 87 || keypressed == 68) && combokeynumber == 2 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
-				}
-			}
-			if (fighters[0].directionfacing == 1) {
-				if (keypressed == 83 && combokeynumber == 2 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 11;
-					keypressed = 0;
-				}
-				else if ((keypressed == 87 || keypressed == 68) && combokeynumber == 2 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+				else if ((this.keypressed == 87 || this.keypressed == 68) && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
 				}
 			}
-
-			if (fighters[0].directionfacing == 0) {
-				if (keypressed == 68 && combokeynumber == 11 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 12;
-					keypressed = 0;
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 83 && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 11;
+					this.keypressed = 0;
 				}
-				else if ((keypressed == 87 || keypressed == 83) && combokeynumber == 11 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+				else if ((this.keypressed == 87 || this.keypressed == 68) && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
 				}
 			}
 
-			if (fighters[0].directionfacing == 1) {
-				if (keypressed == 65 && combokeynumber == 11 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 12;
-					keypressed = 0;
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 68 && this.combokeynumber == 11 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 12;
+					this.keypressed = 0;
 				}
-				else if ((keypressed == 87 || keypressed == 83) && combokeynumber == 11 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 11 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 65 && this.combokeynumber == 11 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 12;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 11 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
 				}
 			}
 
 
-			if (keypressed == 188 && combokeynumber == 12 && combotimer < combotimeneeded && fighters[0].specialtimer > 0 && fighters[0].specialmeter > 149) {
+			if (this.keypressed == 188 && this.combokeynumber == 12 && this.combotimer < combotimeneeded && this.specialtimer > 0 && this.specialmeter > 149) {
 				buttonpress = 0;
-				combotimer = 0;
-				combokeynumber = 0;
-				//	if (fighters[0].jump == 0) {
-				//	smalljumpfighter.call(fighters[0]);
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				//	if (this.jump == 0) {
+				//	smalljumpfighter.call(this);
 				//	}
-				fighters[0].specialmeter -= 150;
-				fighters[0].specialfireballs = 36;
-				projectfighter.call(fighters[0]);
-				fighters[0].specialtimer = -120;
-				keypressed = 0;
+				this.specialmeter -= 150;
+				this.specialfireballs = 100;
+				projectfighter.call(this);
+				this.specialtimer = -120;
+				this.keypressed = 0;
 			}
 
 
 
-			if (fighters[0].directionfacing == 0) {
-				if (keypressed == 65 && combokeynumber == 1 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 3;
-					keypressed = 0;
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 65 && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 3;
+					this.keypressed = 0;
 				}
-				else if ((keypressed == 87 || keypressed == 83) && combokeynumber == 1 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
-				}
-			}
-
-			if (fighters[0].directionfacing == 0) {
-				if (keypressed == 83 && combokeynumber == 3 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 4;
-					keypressed = 0;
-				}
-				else if ((keypressed == 87 || keypressed == 68) && combokeynumber == 3 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
 				}
 			}
 
-			if (fighters[0].directionfacing == 1) {
-				if (keypressed == 68 && combokeynumber == 1 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 3;
-					keypressed = 0;
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 83 && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 4;
+					this.keypressed = 0;
 				}
-				else if ((keypressed == 87 || keypressed == 83) && combokeynumber == 1 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+				else if ((this.keypressed == 87 || this.keypressed == 68) && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 68 && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 3;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
 				}
 			}
 
 
-			if (fighters[0].directionfacing == 1) {
-				if (keypressed == 83 && combokeynumber == 3 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 4;
-					keypressed = 0;
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 83 && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 4;
+					this.keypressed = 0;
 				}
-				else if ((keypressed == 87 || keypressed == 65) && combokeynumber == 3 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+				else if ((this.keypressed == 87 || this.keypressed == 65) && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
 				}
 			}
 
-			if (keypressed == 190 && combokeynumber == 3 && combotimer < combotimeneeded) {
+			if (this.keypressed == 190 && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
 				buttonpress = 0;
-				combotimer = 0;
-				combokeynumber = 0;
-				if (fighters[0].jump == 0 && fighters[0].specialtimer > 0) {
-					smalljumpfighter.call(fighters[0]);
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				if (this.jump == 0 && this.specialtimer > 0) {
+					smalljumpfighter.call(this);
 				}
-				spinkick.call(fighters[0]);
-				keypressed = 0;
+				spinkick.call(this);
+				this.keypressed = 0;
 			}
 
 
-			if (fighters[0].directionfacing == 1) {
-				if (keypressed == 68 && combokeynumber == 4 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 5;
-					keypressed = 0;
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 68 && this.combokeynumber == 4 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 5;
+					this.keypressed = 0;
 				}
-				else if ((keypressed == 87 || keypressed == 65 || keypressed == 83) && combokeynumber == 4 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-				}
-			}
-
-			if (fighters[0].directionfacing == 0) {
-				if (keypressed == 65 && combokeynumber == 4 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 5;
-					keypressed = 0;
-				}
-				else if ((keypressed == 87 || keypressed == 68 || keypressed == 83) && combokeynumber == 4 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+				else if ((this.keypressed == 87 || this.keypressed == 65 || this.keypressed == 83) && this.combokeynumber == 4 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
 				}
 			}
 
-			if (keypressed == 190 && combokeynumber == 5 && combotimer < combotimeneeded && fighters[0].specialmeter > 149) {
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 65 && this.combokeynumber == 4 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 5;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 68 || this.keypressed == 83) && this.combokeynumber == 4 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.keypressed == 190 && this.combokeynumber == 5 && this.combotimer < combotimeneeded && this.specialmeter > 149) {
 				buttonpress = 0;
-				combotimer = 0;
-				combokeynumber = 0;
-				if (fighters[0].jump == 0 && fighters[0].specialtimer > 0) {
-					smalljumpfighter.call(fighters[0]);
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				if (this.jump == 0 && this.specialtimer > 0) {
+					smalljumpfighter.call(this);
 				}
-				fighters[0].specialmeter -= 150;
-				fighters[0].specialspinkick = 2;
-				spinkick.call(fighters[0]);
-				keypressed = 0;
+				this.specialmeter -= 150;
+				this.specialspinkick = 2;
+				spinkick.call(this);
+				this.keypressed = 0;
 			}
 
-		
 
-			if (fighters[0].directionfacing == 0) {
-				if (keypressed == 68 && combokeynumber == 0) {
-					combotimer = 0;
-					combokeynumber = 21;
-					keypressed = 0;
-				}
-			}
 
-			if (fighters[0].directionfacing == 1) {
-				if (keypressed == 65 && combokeynumber == 0) {
-					combotimer = 0;
-					combokeynumber = 21;
-					keypressed = 0;
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 68 && this.combokeynumber == 0) {
+					this.combotimer = 0;
+					this.combokeynumber = 21;
+					this.keypressed = 0;
 				}
 			}
 
-			//console.log(combokeynumber);
-
-			if (keypressed == 83 && combokeynumber == 21 && combotimer < combotimeneeded) {
-				combotimer = 0;
-				combokeynumber = 22;
-				keypressed = 0;
-			}
-			else if ((keypressed == 87 || keypressed == 65 || keypressed == 68) && combokeynumber == 21 && combotimer < combotimeneeded) {
-				combotimer = 0;
-				combokeynumber = 0;
-				keypressed = 0;
-			}
-
-			if (fighters[0].directionfacing == 0) {
-				if (keypressed == 68 && combokeynumber == 22 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 23;
-					keypressed = 0;
-				}
-				else if ((keypressed == 87 || keypressed == 65 || keypressed == 83) && combokeynumber == 22 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 65 && this.combokeynumber == 0) {
+					this.combotimer = 0;
+					this.combokeynumber = 21;
+					this.keypressed = 0;
 				}
 			}
 
-			if (fighters[0].directionfacing == 1) {
-				if (keypressed == 65 && combokeynumber == 22 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 23;
-					keypressed = 0;
+			//console.log(this.combokeynumber);
+
+			if (this.keypressed == 83 && this.combokeynumber == 21 && this.combotimer < combotimeneeded) {
+				this.combotimer = 0;
+				this.combokeynumber = 22;
+				this.keypressed = 0;
+			}
+			else if ((this.keypressed == 87 || this.keypressed == 65 || this.keypressed == 68) && this.combokeynumber == 21 && this.combotimer < combotimeneeded) {
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				this.keypressed = 0;
+			}
+
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 68 && this.combokeynumber == 22 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 23;
+					this.keypressed = 0;
 				}
-				else if ((keypressed == 87 || keypressed == 68 || keypressed == 83) && combokeynumber == 22 && combotimer < combotimeneeded) {
-					combotimer = 0;
-					combokeynumber = 0;
-					keypressed = 0;
+				else if ((this.keypressed == 87 || this.keypressed == 65 || this.keypressed == 83) && this.combokeynumber == 22 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
 				}
 			}
 
-			if (keypressed == 188 && combokeynumber == 23 && combotimer < combotimeneeded && fighters[0].jump == 0) {
-				combotimer = 0;
-				combokeynumber = 0;
-				keypressed = 0;
-				shoryuken.call(fighters[0]);
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 65 && this.combokeynumber == 22 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 23;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 68 || this.keypressed == 83) && this.combokeynumber == 22 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
 			}
+
+			if (this.keypressed == 188 && this.combokeynumber == 23 && this.combotimer < combotimeneeded && this.jump == 0) {
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				this.keypressed = 0;
+				shoryuken.call(this);
+			}
+
 
 
 
@@ -2530,19 +2618,19 @@
 			//console.log(buttonpress)
 
 			if (e.keyCode == 68) {
-				rightkeydown = false;
+				fighters[0].rightkeydown = false;
 				if (fighters[0].jump == 0 && fighters[0].crouch == 0 && fighters[0].spins == 0 && fighters[0].specialfireballs==0) {
 					idlefighter.call(fighters[0]);
 				}
 			}
 			if (e.keyCode == 65) {
-				leftkeydown = false;
+				fighters[0].leftkeydown = false;
 				if (fighters[0].jump == 0 && fighters[0].crouch == 0 && fighters[0].spins == 0 && fighters[0].specialfireballs == 0) {
 					idlefighter.call(fighters[0]);
 				}
 			}
 			if (e.keyCode == 83) {
-				buttonpress = 6;
+				fighters[0].buttonpress = 6;
 				buttonpresstimer = 60;
 				fighters[0].crouch = 0;
 			}
@@ -2554,7 +2642,7 @@
 		//	console.log(e)
 		//	console.log(e.keyCode);
 
-			keypressed = e.keyCode;
+			fighters[0].keypressed = e.keyCode;
 
 			//console.log(e)
 			//console.log(e.which);
@@ -2563,31 +2651,31 @@
 
 			if (e.keyCode == 68 || e.which == 68) {
 
-				rightkeydown = true;
+				fighters[0].rightkeydown = true;
 
 			}
 			if (e.keyCode == 65 || e.which == 65) {
 
-				leftkeydown = true;
+				fighters[0].leftkeydown = true;
 			}
 			if (e.keyCode == 87) {
-				buttonpress = 3;
+				fighters[0].buttonpress = 3;
 				buttonpresstimer = 60;
 			}
 			if (e.keyCode == 86) {
-				buttonpress = 8;
+				fighters[0].buttonpress = 8;
 				buttonpresstimer = 60;
 			}
 			if (e.keyCode == 83) {
-				buttonpress = 7;
+				fighters[0].buttonpress = 7;
 				buttonpresstimer = 60;
 			}
 			if (e.keyCode == 190) {
-				buttonpress = 10;
+				fighters[0].buttonpress = 10;
 				buttonpresstimer = 60;
 			}
 			if (e.keyCode == 188) {
-				buttonpress = 5;
+				fighters[0].buttonpress = 5;
 				buttonpresstimer = 60;
 			}
 			if (e.keyCode == 85) {
@@ -2597,7 +2685,89 @@
 				gamestart = 1;
 			}
 
-		}
+				}
+
+
+				function keysUp(e) {
+
+					//console.log(e)
+					//console.log(buttonpress)
+
+					if (e.keyCode == 68) {
+						this.rightkeydown = false;
+						if (this.jump == 0 && this.crouch == 0 && this.spins == 0 && this.specialfireballs == 0) {
+							idlefighter.call(this);
+						}
+					}
+					if (e.keyCode == 65) {
+						this.leftkeydown = false;
+						if (this.jump == 0 && this.crouch == 0 && this.spins == 0 && this.specialfireballs == 0) {
+							idlefighter.call(this);
+						}
+					}
+					if (e.keyCode == 83) {
+						this.buttonpress = 6;
+						this.buttonpresstimer = 60;
+						this.crouch = 0;
+					}
+
+				}
+
+
+				function keysDown(e) {
+
+					//	console.log(e)
+					//	console.log(e.keyCode);
+
+					this.keypressed = e.keyCode;
+
+					//console.log(e)
+					
+
+					//console.log(e)
+					//console.log(e.which);
+					//console.log(e.keyCode);
+					//console.log(buttonpress, moveleftright, e.keyCode)
+
+					if (e.keyCode == 68 || e.which == 68) {
+
+						this.rightkeydown = true;
+
+					}
+					if (e.keyCode == 65 || e.which == 65) {
+
+						this.leftkeydown = true;
+					}
+					if (e.keyCode == 87) {
+						this.buttonpress = 3;
+						buttonpresstimer = 60;
+						//console.log(this.buttonpress)
+					}
+					if (e.keyCode == 86) {
+						this.buttonpress = 8;
+						buttonpresstimer = 60;
+					}
+					if (e.keyCode == 83) {
+						this.buttonpress = 7;
+						buttonpresstimer = 60;
+					}
+					if (e.keyCode == 190) {
+						this.buttonpress = 10;
+						buttonpresstimer = 60;
+					}
+					if (e.keyCode == 188) {
+						this.buttonpress = 5;
+						buttonpresstimer = 60;
+					}
+					if (e.keyCode == 85) {
+						shoryuken.call(this);
+					}
+					if (e.keyCode == 49 && fighters[1].ypos == -800) {
+						gamestart = 1;
+					}
+
+
+				}
 
 		document.addEventListener("touchstart", touchstart);
 
