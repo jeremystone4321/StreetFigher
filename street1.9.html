@@ -1,0 +1,2962 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8" />
+	<title></title>
+</head>
+<body>
+	<canvas id="myCanvas" width="1500" height="800"></canvas>
+
+	<script>
+
+		var canvas = document.getElementById("myCanvas");
+		var ctx = canvas.getContext("2d");
+
+
+
+		class Fighter {
+
+			constructor(name, height, width, speed, power, defense, dodge, health, winrecord, xpos, ypos) {
+				this.name = "Cain";
+				this.speed = Math.floor(Math.random() * 10) + 1;
+				this.power = Math.floor(Math.random() * 10) + 1;
+				this.defense = Math.floor(Math.random() * 10) + 1;
+				this.health = Math.floor(Math.random() * 100) + 100;
+				this.height = 20 * this.power;
+				this.width = 20 * this.defense;
+				this.winrecord = 0;
+
+				this.ryu = function () {
+					this.name = "Ryu";
+					this.speed = 3;
+					this.power = 3;
+					this.defense = 3;
+					this.health = 100;
+					this.height = 200;
+					this.width = 150;
+					this.player = 2;
+					this.specialmovescombo = [[4, 2, 6]
+						, [4, 1, 7]];
+					this.specialmoves = [["projectile", 5, 5, 1, 1]
+						, ["body", 3, 1, 1, 1]];
+					this.sprites = new Image();
+					this.sprites.src = "ryu sprites s.gif";
+					this.spriteycoordinates = [0, 12.3, 2.2, 3.35, 14.8, 7, 24, 24, 5.8, 19.5, 10.4, 12.35, 18, 20.7];
+					this.spritecorrections = [0, 0, 21, 0, -65, 0, 0, 5, 0, -20, -40, -80, -20];
+					this.spritecorrectionsizes = [0, 0, 10, 4, 30, 45, 0, 15, 0, 0, 40, 50, 0];
+					this.animationtimingsneeded = [10, 0, 10, 22, 15, 15, 16, 28, 0, 15, 15, 15, 10];
+					this.animationsneeded = [5, 0, 7, 7, 1, 1, 5, 5, 0, 5, 1, 1, 1];
+					this.xpos = 600;//1200;
+					this.ypos = 450;
+
+					this.combo = 0;
+					this.animation = 0;
+					this.animationtiming = 10;
+					this.animationtimer = 0;
+					this.crouch = 0;
+					this.jump = 0;
+					this.punch = 0;
+					this.movement = 0;
+					this.animationreverse = 1;
+					this.spritesheet = 0;
+					this.spritecorrection = 0;
+					this.spritecorrectionsize = 0;
+					this.jump = 0;
+					this.animationbeingused = 5;
+					this.directionfacing = 1;
+					this.hit = 0;
+					this.combohitted = 0;
+					this.stuncounter = 0;
+					this.stunned = 0;
+					this.punchtimer = 0;
+					this.specialtimer = 0;
+					this.combohittimer = 0;
+					this.flairflop = 0;
+					this.blocking = 0;
+					this.jumpheight = 0;
+					this.score = 0;
+					this.health = 200;
+					this.unblockablespecial = 0;
+					this.spins = 0;
+					this.specialspinkick = 0;
+					this.specialfireballs = 0;
+					this.specialmeter = 0;
+					this.wins = 0;
+
+					this.buttonpress = 0;
+					this.moveleftright = 0;
+
+					this.rightkeydown = false;
+					this.leftkeydown = false;
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+					this.controllertimer = 0;
+					this.previouspadbutton = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+				}
+
+
+				this.evilryu = function () {
+					this.name = "Evil Ryu";
+					this.speed = 3;
+					this.power = 3;
+					this.defense = 3;
+					this.health = 100;
+					this.height = 200;
+					this.width = 150;
+					this.player = 1;
+					this.specialmovescombo = [[4, 2, 6]
+						, [4, 1, 7]];
+					this.specialmoves = [["projectile", 5, 5, 1, 1]
+						, ["body", 3, 1, 1, 1]];
+					this.sprites = new Image();
+					this.sprites.src = "evil ryu s.gif";
+					this.spriteycoordinates = [0, 12.3, 2.2, 3.35, 14.8, 7, 24, 24, 5.8, 19.5, 10.4, 12.35, 18, 20.7];
+					this.spritecorrections = [0, 0, 21, 0, -65, 0, 0, 5, 0, -20, -40, -80, -20];
+					this.spritecorrectionsizes = [0, 0, 10, 4, 30, 45, 0, 15, 0, 0, 40, 50, 0];
+					this.animationtimingsneeded = [10, 0, 10, 22, 15, 15, 16, 28, 0, 15, 15, 15, 10];
+					this.animationsneeded = [5, 0, 7, 7, 1, 1, 5, 5, 0, 5, 1, 1, 1];
+					/*
+					this.spriteycoordinates = [0, 12.3, 2.2, 3.35, 14.8, 7, 24,24,5.8];
+					this.spritecorrections = [0, 0, 21, 0, -65, 0, 0,0,0];
+					this.spritecorrectionsizes = [0, 0, 10, 4, 30, 45, 0,0,0];
+					this.animationtimingsneeded = [10, 0, 10, 22, 15, 15, 15,15,0];
+					this.animationsneeded = [5, 0, 7, 7, 1, 1, 5,6,7];
+					*/
+					this.xpos = 100;
+					this.ypos = 450;
+
+					this.combo = 0;
+					this.animation = 0;
+					this.animationtiming = 10;
+					this.animationtimer = 0;
+					this.crouch = 0;
+					this.jump = 0;
+					this.punch = 0;
+					this.movement = 0;
+					this.animationreverse = 1;
+					this.spritesheet = 0;
+					this.spritecorrection = 0;
+					this.spritecorrectionsize = 0;
+					this.jump = 0;
+					this.animationbeingused = 5;
+					this.directionfacing = 0;
+					this.directionjump = 0;
+					this.hit = 0;
+					this.combohitted = 0;
+					this.stuncounter = 0;
+					this.stunned = 0;
+					this.punchtimer = 0;
+					this.specialtimer = 0;
+					this.combohittimer = 0;
+					this.flairflop = 0;
+					this.blocking = 0;
+					this.jumpheight = 0;
+					this.score = 0;
+					this.health = 200;
+					this.unblockablespecial = 0;
+					this.spins = 0;
+					this.specialspinkick = 0;
+					this.specialfireballs = 0;
+					this.specialmeter = 0;
+					this.wins = 0;
+
+					this.buttonpress = 0;
+					this.moveleftright = 0;
+
+					this.rightkeydown = false;
+					this.leftkeydown = false;
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+					this.controllertimer = 0;
+					this.previouspadbutton = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+
+				}
+ 
+				/*this.dhal = function () {
+					this.name = "Dhalsim";
+					this.speed = 3;
+					this.power = 3;
+					this.defense = 3;
+					this.health = 100;
+					this.height = 200;
+					this.width = 150;
+					this.player = 1;
+					this.specialmovescombo = [[4, 2, 6]
+						, [4, 1, 7]];
+					this.specialmoves = [["projectile", 5, 5, 1, 1]
+						, ["body", 3, 1, 1, 1]];
+					this.sprites = new Image();
+					this.sprites.src = "dhally.gif";
+					this.spriteycoordinates = [0.15, 2, 3, 4, 5, 6];
+					this.spritecorrections = [8, 0, 21, 0, -65, 0];
+					this.spritecorrectionsizes = [0, 0, 10, 4, 30, 45];
+					this.animationtimingsneeded = [10, 0, 10, 20, 15, 30];
+					this.animationsneeded = [5, 0, 7, 7, 1, 1];
+					this.xpos = 1200;
+					this.ypos = 450;
+
+					this.combo = 0;
+					this.animation = 0;
+					this.animationtiming = 10;
+					this.animationtimer = 0;
+					this.crouch = 0;
+					this.jump = 0;
+					this.punch = 0;
+					this.movement = 0;
+					this.animationreverse = 1;
+					this.spritesheet = this.spriteycoordinates[0];
+					this.spritecorrection = 0;
+					this.spritecorrectionsize = 0;
+					this.jump = 0;
+					this.animationbeingused = 5;
+					this.directionfacing = 1;
+
+					idlefighter.call(this);
+
+				}
+				*/
+
+/////4444444
+
+				this.ryu.specialmove = function (x) {
+					if (x == "fireball") {
+						//console.log("fireball");
+					}
+				}
+
+				this.ken = function () {
+					this.name = "Ken";
+					this.speed = 3;
+					this.power = 3;
+					this.defense = 3;
+					this.health = 100;
+					this.height = 200;
+					this.width = 150;
+				}
+
+			}
+
+		}
+
+		class projectile {
+			constructor(m) {//speed, power, direction, player, xpos, ypos)
+				this.speed = 5;
+				this.power = 5;
+				this.directionfacing = m.directionfacing;
+				this.player = m.player;
+				this.xpos = m.xpos + 155;
+				if (m.directionfacing == 1) {
+					this.xpos = m.xpos + 50;
+				}
+				this.ypos = m.ypos + 50;
+				this.animation = 0;
+				this.animationtimer = 0;
+
+			}
+		}
+
+		class aistuff {
+			constructor() {
+				this.simpleaitimer = 0;
+				this.aimode = 2;
+				this.aimove = 0;
+			}
+		}
+
+		var ai = [];
+		ai[0] = new aistuff();
+		ai[1] = new aistuff();
+
+		var fighters = [];
+
+		fighters[0] = new Fighter();
+		fighters[1] = new Fighter();
+
+
+		//function ryu() {
+		//console.log(this.name);
+		//}
+
+		fighters[0].evilryu();
+		//fighters[0].dhal();
+		fighters[1].ryu();
+		//fighters[0].ryu.specialmove();
+		fighters[0].ryu.specialmove(fighters[0].specialmoves[0][0]);
+		//ryu.call(fighters[0]);
+
+		//var ryusprite = new Image();
+		//ryusprite.src = "ryu.png";
+
+		var background = new Image();
+		background.src = "background ryu.gif";
+		var projectiles = [];
+
+		var bgd = [];
+
+		for (x = 0; x < 10; x++) {
+			bgd[x] = new Image();
+			bgd[x].src = "bgd/frame_0" + x + "_delay-0.2s.gif";
+			//console.log(x)
+
+		}
+		for (x = 10; x < 12; x++) {
+			bgd[x] = new Image();
+			bgd[x].src = "bgd/frame_" + x + "_delay-0.2s.gif";
+
+
+		}
+
+
+
+		var buttonpress = 0;
+		var moveleftright = 0;
+
+		var combotimer = 0;
+		var combokeynumber = 0;
+		var keypressed = 0;
+		var controllertimer = 0;
+
+
+		//var previouspadbutton = [
+			//[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+			//[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+		//];
+		var buttonkeys = [190, 190, 188, 188, 0, 0, 0, 0, 49, 50, 0, 0, 87, 83, 65, 68];
+
+		var buttonused = 0;
+
+
+		var haduk = [];
+		haduk[0] = new Image();
+		haduk[1] = new Image();
+		haduk[2] = new Image();
+
+		haduk[0].src = "haduk1.png";
+		haduk[1].src = "haduk2.png";
+		haduk[2].src = "haduk3.png";
+		
+
+
+		var theme = new Audio("sfx/theme.mp3");
+		var haduksfx = new Audio("sfx/5.mp3");
+		var blocksfx = new Audio("sfx/2BH (2).mp3");
+		var hitsfx = new Audio("sfx/hit sound 2.wav");
+		var badlyhitsfx = new Audio("sfx/1.mp3");
+		var punchswingsfx = new Audio("sfx/punch swing.mp3");
+		var punchexhalesfx = new Audio("sfx/9.mp3");
+		var spinkickfx = new Audio("sfx/7.mp3");
+		var gamestartfx = new Audio("sfx/game start.wav");
+		var roundsfx = new Audio("sfx/round.mp3");
+		var numonefx = new Audio("sfx/num1.mp3");
+		var numtwofx = new Audio("sfx/num2.mp3");
+		var numthreefx = new Audio("sfx/num3.mp3");
+		var fightfx = new Audio("sfx/fight.mp3");
+		var youwinfx = new Audio("sfx/youwin.mp3");
+		var youlosefx = new Audio("sfx/youlose.mp3");
+		var finalfx = new Audio("sfx/final.mp3");
+		var loserfx = new Audio("sfx/loserfx.wav");
+		var winnerfx = new Audio("sfx/winnerfx.wav");
+
+		var redbar = new Image();
+		redbar.src = "redbar.png";
+		var greenbar = new Image();
+		greenbar.src = "greenbar.png";
+		var bluebar = new Image();
+		bluebar.src = "bluebar.png";
+		var brightbluebar = new Image();
+		brightbluebar.src = "brightblue.png";
+		var blackbar = new Image();
+		blackbar.src = "blackbar.png";
+		var ryulosescreen = new Image();
+		ryulosescreen.src = "ryulose.gif";
+		var ryuwinscreen = new Image();
+		ryuwinscreen.src = "evilryuwin.gif";
+		var yellowcircle = new Image();
+		yellowcircle.src = "yellowcirc.png";
+
+
+		function playmusic() {
+			theme.play();
+		}
+
+		var frame = 0;
+
+		var bgdtimer = 0;
+		var bgdnum = 0;
+
+		var x = 0;
+		var musicplayed = 0;
+		var gameready = 0;
+		var loadingtimer = 0;
+		var gamestart = 0;
+
+		var youwin = 0;
+		var round = 0;
+		var winone = 0;
+		var wintwo = 0;
+
+		//background.src = "/bgd/frame_0" + x + "_delay-0.2s.gif";
+		//background.src = "bgd/frame_00_delay-0.2s.gif";
+
+		//console.log("/bgd/frame_0" + x + "_delay-0.2s.gif");
+
+		var pushedstart = 0;
+		var pausedgame = 0;
+
+		function drawFight() {
+			//frame++;
+
+			//console.log(theme.readyState)
+
+			//console.log(controller);
+			var controller;
+			var controllerone;
+			var controllertwo;
+
+			controller = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);//navigator.getGamepads();
+
+			controllerone = controller[0];
+			controllertwo = controller[1];
+
+			fighters[0].controllertimer++;
+			fighters[1].controllertimer++;
+
+			//console.log(controllerone.buttons)
+			/*
+			if (controller !== undefined && controllerone !== null) {
+				if (controllerone.buttons[9].pressed == true) {
+					var e = { keyCode: 49 };
+					keyDown(e);
+				}
+			}
+			*/
+
+			if (controller !== undefined && controllerone !== null) {
+				//console.log(controllerone.axes[0])
+				controllercheckbutton.call(fighters[0], controllerone);
+			}
+
+			if (controller !== undefined && controllertwo !== null) {
+
+				controllercheckbutton.call(fighters[1], controllertwo);
+			}
+/*
+				if (controller !== undefined && controllerone !== null && controllertimer > 8) {
+					if (controllerone.buttons[1].pressed == true) {
+						controllertimer = 0;
+						var e = { keyCode: 65 };
+						keyDown(e);
+						previouspadbutton[0][1] = 65;
+					}
+				}
+				else if (controller !== undefined && controllerone !== null && previouspadbutton[0][1] == 65) {
+					if (controllerone.buttons[1].pressed == false) {
+						var e = { keyCode: 65 };
+						keyUp(e);
+						previouspadbutton[0][1] = 0;
+					}
+				}
+				*/
+			//}
+
+			if (gameready == 0) {
+				loadingtimer++;
+				loadscreen();
+				return;
+			}
+
+
+
+
+			if (pausedgame == 1) {
+
+				ctx.fillStyle = "orange";
+				ctx.font = (280) + "px Arial";
+				ctx.fillText("Paused!", 300, 400);
+				return;
+			}
+
+
+			bgdtimer++;
+
+			if (bgdtimer == 20) {
+				bgdtimer = 0;
+				bgdnum++;
+				if (bgdnum == 12) {
+					bgdnum = 0;
+				}
+			}
+
+			ctx.drawImage(bgd[bgdnum], 0, 0, 1500, 800)
+			//ctx.drawImage(bgd[bgdnum], 0, 118, 0, 0, 400, 1500, 400)
+
+
+			//ctx.drawImage(background, 0, 0, 1500, 800)
+
+			drawbars();
+
+			drawfighter.call(fighters[0]);
+			drawfighter.call(fighters[1]);
+
+
+			//ctx.drawImage(fighters[0].sprites, fighters[0].spritecorrection + 36 + 75 * (fighters[0].animation), 120 + 100 * (fighters[0].spritesheet), 75 + fighters[0].spritecorrectionsize, 100, fighters[0].xpos, fighters[0].ypos, 200 + fighters[0].spritecorrectionsize, 300)
+
+			//ctx.drawImage(fighters[1].sprites, fighters[1].spritecorrection + 36 + 75 * (fighters[1].animation), 120 + 100 * (fighters[1].spritesheet), 75 + fighters[1].spritecorrectionsize, 100, fighters[1].xpos, fighters[1].ypos, 200 + fighters[1].spritecorrectionsize, 300)
+
+			//fighters[0].call(animation);
+			animation.call(fighters[0]);
+			animation.call(fighters[1]);
+
+			//console.log(fighters[0].spins)
+
+
+			if (gamestart == 3) {
+				if (fighters[0].wins == 2) {
+					drawwinscreen();
+					return;
+				}
+				if (fighters[1].wins == 2) {
+					drawlosescreen();
+					return;
+				}
+				if (round == 3) {
+					finalfx.play()
+				}
+				else {
+					roundsfx.play();
+				}
+				
+				gamestart = 4;
+				return;
+			}
+
+			if (gamestart == 4) {
+
+				ctx.fillStyle = "orange";
+				ctx.font = (180) + "px Comic Sans";
+				ctx.fillText("Round "+round, 400, 400);
+
+				if ((roundsfx.currentTime > 0.9 && round < 3) || (round == 3 && finalfx.currentTime>0.8)) {
+					if (round == 1) { numonefx.play(); }
+					if (round == 2) { numtwofx.play(); }
+					if (round == 3) { roundsfx.play(); }
+					gamestart = 5;
+					return;
+				}
+				return;
+			}
+
+			if (gamestart == 5) {
+
+				ctx.fillStyle = "orange";
+				ctx.font = (180) + "px Comic Sans";
+				ctx.fillText("Round "+round, 400, 400);
+
+				if ((round == 1 && numonefx.currentTime > 0.45) ||
+					(round == 2 && numtwofx.currentTime > 0.45) ||
+					(round == 3 && roundsfx.currentTime > 0.9) ) {
+					fightfx.play()
+					gamestart = 6;
+					return;
+				}
+				return;
+			}
+
+			if (gamestart == 6) {
+
+				ctx.fillStyle = "orange";
+				ctx.font = (280) + "px Arial";
+				ctx.fillText("FIGHT!", 300, 400);
+
+				if (fightfx.currentTime > 0.52) {
+					gamestart = 7;
+					return;
+				}
+				return;
+			}
+
+
+
+			checkhealth();
+
+			if (youwin == 1) {
+				theme.currentTime = 100;
+				flairflop.call(fighters[1]);
+				idlefighter.call(fighters[0]);
+				youwin = 2;
+				fighters[0].wins++;
+
+				return;
+			}
+
+			if (youwin == 2) {
+				if (theme.currentTime > 101) {
+					fighters[1].animation = 6;
+					fighters[0].animation = 0;
+					fighters[1].ypos = 500;
+					bgdnum = 0;
+					bgdtimer = 0;
+				}
+
+				if (theme.currentTime > 102 && theme.currentTime < 103) {
+					youwinfx.play();
+				}
+
+				if (theme.currentTime > 105) {
+					if (fighters[0].wins == 2) {
+						winnerfx.play();
+					}
+					youwin = 0;
+					idlefighter.call(fighters[0]);
+					idlefighter.call(fighters[1]);
+					initpositions();
+					round++;
+					gamestart = 2;
+				}
+				return;
+
+			}
+
+			if (youwin == -1) {
+				theme.currentTime = 100;
+				flairflop.call(fighters[0]);
+				idlefighter.call(fighters[1]);
+				youwin = -2;
+				fighters[1].wins++;
+
+				return;
+			}
+
+			if (youwin == -2) {
+				if (theme.currentTime > 101) {
+					fighters[0].animation = 6;
+					fighters[1].animation = 0;
+					fighters[0].ypos = 500;
+					bgdnum = 0;
+					bgdtimer = 0;
+				}
+
+				if (theme.currentTime > 102 && theme.currentTime < 103) {
+					youlosefx.play();
+				}
+
+				if (theme.currentTime > 105) {
+					if (fighters[1].wins == 2) {
+						loserfx.play();
+					}
+					youwin = 0;
+					idlefighter.call(fighters[0]);
+					idlefighter.call(fighters[1]);
+					initpositions();
+					round++;
+					gamestart = 2;
+				}
+				return;
+
+			}
+
+
+			checkbuttonpressed.call(fighters[0]);
+
+			checkbuttonpressed.call(fighters[1]);
+
+			/*
+			if (fighters[0].spins == 0 && fighters[0].specialfireballs == 0 && buttonpress!==0) {
+				if (fighters[0].crouch == 0 && buttonpress !== 8) {
+					if (rightkeydown == true) {
+						movefighter.call(fighters[0], 1);
+					}
+					else if (leftkeydown == true) {
+						movefighter.call(fighters[0], -1);
+					}
+				}
+
+				if (buttonpress == 3) {
+					jumpfighter.call(fighters[0], 1);
+				}
+				else if (buttonpress == 8) {
+					buttonpress = 0;
+					projectfighter.call(fighters[0]);
+				}
+				else if (buttonpress == 7 && fighters[0].jump == 0) {
+					buttonpress = 0;
+					crouchfighter.call(fighters[0]);
+				}
+				else if (buttonpress == 6 && fighters[0].jump == 0) {
+					buttonpress = 0;
+					idlefighter.call(fighters[0]);
+				}
+				else if (buttonpress == 5) {
+					punch.call(fighters[0]);
+					buttonpress = 0;
+				}
+				else if (buttonpress == 10) {
+					kick.call(fighters[0]);
+					buttonpress = 0;
+				}
+
+				if (buttonpress == 9 && fighters[0].jump == 0) {
+					idlefighter.call(fighters[0]);
+					buttonpress = 0;
+				}
+				fighters[0].buttonpress = buttonpress;
+				fighters[0].keypressed = keypressed
+
+			}
+			*/
+
+
+
+			timers.call(fighters[0]);
+			timers.call(fighters[1]);
+
+			//console.log(moveleftright)
+
+
+			jumping.call(fighters[0]);
+			jumping.call(fighters[1]);
+
+
+
+			checkprojectiles();
+
+
+			if (gamestart == 0) {
+				fun();
+				fighters[0].stunned = 1;
+				waitingforplay();
+				fighters[1].ypos = -800;
+				round = 1;
+				return
+			}
+
+			if (gamestart == 1) {
+
+				startupshor.call(fighters[0]);
+				return;
+			}
+
+
+			if (gamestart == 11) {
+				projectiles = [];
+				startupshor.call(fighters[pushedstart]);
+				return;
+
+			}
+
+
+			if (gamestart == 2) {
+				if (fighters[0].jump == 0 && fighters[1].jump==0) {
+
+					initpositions();
+					gamestart = 3;
+				}
+				return;
+			}
+
+
+
+
+			if (theme.readyState == 4 && musicplayed == 0) {
+				//console.log(theme.promise)
+				playmusic();
+			}
+
+			if (theme.currentTime > 100 && youwin == 0) {
+				theme.currentTime = 0;
+			}
+
+
+			if (ai[1].aimode !== 99) { simpleai.call(fighters[1], ai[1]); }
+			if (ai[0].aimode !== 99) { simpleai.call(fighters[0], ai[0]); }
+
+			combomove.call(fighters[0]);
+			combomove.call(fighters[1]);
+
+			spinmoves.call(fighters[0]);
+			spinmoves.call(fighters[1]);
+			specialfire.call(fighters[0]);///////////////////////////
+			specialfire.call(fighters[1]);
+			checkdirectionfacing();
+			checkflop.call(fighters[0]);
+			checkflop.call(fighters[1]);
+			checkcollideeachother(fighters[0], fighters[1]);
+			checkcollideeachother(fighters[1], fighters[0]);
+
+			if (Math.random * 100 > 50) {
+				checkpunch(fighters[0], fighters[1]);
+				checkpunch(fighters[1], fighters[0]);
+			} else {
+				checkpunch(fighters[1], fighters[0]);
+				checkpunch(fighters[0], fighters[1]);
+			}
+
+
+			if (ai[0].aimode == 99) { checkblock.call(fighters[0]); }
+			if (ai[1].aimode == 99) { checkblock.call(fighters[1]); }
+
+
+
+			//projectfighter.call(fighters[1]);
+			//punch.call(fighters[1]);
+			//movefighter.call(fighters[1], -1);
+
+
+
+
+			//fighters[0].spritesheet = 3;
+
+
+			/*
+			if (Math.random() * 100 < 5) { jumpfighter.call(fighters[0], 1); }
+
+			if (Math.random() * 100 > 5) { projectiles.push(new projectile()); }
+			*/
+
+			/*if (Math.random() * 100 > 50) {
+				movefighter.call(fighters[0], 1);
+			}
+			else {
+
+				movefighter.call(fighters[0], -1);
+			}
+
+			if (Math.random() * 100 > 50) {
+				fighters[0].ypos += 12;
+				if (fighters[0].ypos > 750) {
+					fighters[0].ypos -= 12;
+				}
+			}
+			else {
+
+				fighters[0].ypos -= 12;
+				if (fighters[0].ypos < 150) {
+					fighters[0].ypos += 12;
+				}
+			}
+			*/
+
+			//fun();
+
+		}
+
+
+		//var simpleaitimer = 0;
+		//var aimode = 0;
+		//var aimove = 0;
+
+		function simpleai(m) {
+
+			m.simpleaitimer++;
+
+			//if (this.jump == 0 && this.specialtimer > 0) {
+			//	smalljumpfighter.call(this);
+			//	shoryuken.call(this);
+			//}
+			//return;
+
+			//projectfighter.call(this);
+			//return;
+			//this.blocking = 1;
+			//return;
+			//crouchfighter.call(this);
+			//return;
+
+			if (m.simpleaitimer > 0 && this.spins == 0 && this.specialfireballs == 0 && this.stunned == 0 && this.stuncounter>0) {
+				m.simpleaitimer = -60;
+				m.aimode = Math.floor(Math.random() * 10);
+				if (this.specialfireballs == 0) { m.aimove = Math.floor(Math.random() * 2); }
+				this.blocking = 0;
+				this.crouch = 0;
+				if (this.jump == 0 && this.stunned == 0 && this.spins==0) { idlefighter.call(this); }
+				//console.log(aimode);
+			}
+			//m.aimode = 4;
+			//m.aimove = 4;
+
+			if (this.specialmeter > 149 && this.specialtimer > 0 && Math.random() * 100 > 70 && this.specialfireballs==0 && this.spins==0) {
+				this.blocking = 0;
+				this.crouch = 0;
+				m.aimode = 9;
+			}
+
+			if (m.aimode == 0) {
+				projectfighter.call(this);
+			}
+			if (m.aimode == 1) {
+				if (Math.random() * 100 < 50) {
+					punch.call(this);
+				} else {
+					kick.call(this);
+				}
+			}
+			if (m.aimode == 2) {
+				this.blocking = 1;
+			}
+			if (m.aimode == 3) {
+				if (this.jump !== 0) {
+					m.aimode = 1;
+				}
+				crouchfighter.call(this);
+				this.blocking = 1;
+			}
+			if (m.aimode == 4) {
+				jumpfighter.call(this);
+			}
+			if (m.aimode == 5) {
+				if (this.jump !== 0) {
+					m.aimode = 1;
+				}
+				if (this.crouch == 0) { crouchfighter.call(this); }
+				if (Math.random() * 100 < 50) {
+					punch.call(this);
+				} else {
+					kick.call(this);
+				}
+			}
+			if (m.aimode == 6) {
+				if (this.jump == 0) {
+					smalljumpfighter.call(this);
+				}
+
+				spinkick.call(this);
+			}
+
+			if (m.aimode == 7) {
+				jumpfighter.call(this);
+				spinkick.call(this);
+			}
+			if (m.aimode == 8) {
+				if (this.jump == 0 && this.specialtimer > 0) {
+					smalljumpfighter.call(this);
+					shoryuken.call(this);
+				}
+				else {
+					m.aimode = 1;
+				}
+			}
+
+			if (m.aimode == 9) {
+				if (this.specialmeter > 149 && this.specialtimer>0) {
+
+					
+					if (Math.random() * 100 > 50) {
+						if (this.jump == 0 && this.specialtimer > 0) {
+							smalljumpfighter.call(this);
+						}
+						this.specialmeter -= 150;
+						this.specialspinkick = 2;
+						spinkick.call(this);
+
+					}
+					else {
+					
+						this.specialmeter -= 150;
+						this.specialfireballs = 100;
+						projectfighter.call(this);
+						this.specialtimer = -120;
+						/*
+						 if (this.directionfacing == 0) {
+							m.aimove = 0;
+						}
+						if (this.directionfacing == 1) {
+							m.aimove = 1;
+						}
+						*/
+					}
+				}
+				else {
+					m.aimode = 0;
+				}
+			}
+
+
+			if (this.spins == 0 && this.specialfireballs == 0) {
+				if (m.aimove == 0) {
+					movefighter.call(this, -1);
+				}
+				if (m.aimove == 1) {
+					movefighter.call(this, 1);
+				}
+			}
+
+
+
+
+		}
+
+
+		var taptwice = 0;
+
+		function loadscreen() {
+
+			if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && taptwice<2) {
+
+				ctx.fillStyle = "black";
+				ctx.font = (300) + "px Arial";
+				ctx.fillText("Tap Twice", 50, 500);
+
+
+				return;
+			}
+
+			ctx.fillStyle = "black";
+			ctx.font = (300) + "px Arial";
+			ctx.fillText("LOADING...", 50, 500);
+
+			if (theme.readyState == 4 &&
+				haduksfx.readyState == 4 &&
+				blocksfx.readyState == 4 &&
+				hitsfx.readyState == 4 &&
+				badlyhitsfx.readyState == 4 &&
+				punchswingsfx.readyState == 4 &&
+				punchexhalesfx.readyState == 4 &&
+				spinkickfx.readyState == 4 &&
+				gamestartfx.readyState == 4 &&
+				roundsfx.readyState == 4 &&
+				numonefx.readyState == 4 &&
+				numtwofx.readyState == 4 &&
+				numthreefx.readyState == 4 &&
+				fightfx.readyState == 4 &&
+				youwinfx.readyState == 4 &&
+				youlosefx.readyState == 4 &&
+				loserfx.readyState == 4 &&
+				finalfx.readyState == 4 &&
+				winnerfx.readyState == 4 &&
+				loadingtimer > 240) {
+				console.log(loadingtimer)
+				gameready = 1;
+			}
+
+		}
+
+		function checkbuttonpressed() {
+
+
+			
+
+			if (this.spins == 0 && this.specialfireballs == 0) {
+				if (this.crouch == 0 && this.buttonpress !== 8) {
+					if (this.rightkeydown == true) {
+						movefighter.call(this, 1);
+					}
+					else if (this.leftkeydown == true) {
+						movefighter.call(this, -1);
+					}
+				}
+
+				if (this.buttonpress == 3) {
+					jumpfighter.call(this, 1);
+					this.buttonpress = 0;
+				}
+				else if (this.buttonpress == 8) {
+					this.buttonpress = 0;
+					projectfighter.call(this);
+				}
+				else if (this.buttonpress == 7 && this.jump == 0 && this.crouch==0) {
+					this.buttonpress = 0;
+					crouchfighter.call(this);
+				}
+				else if (this.buttonpress == 6 && this.jump == 0) {
+					this.buttonpress = 0;
+					idlefighter.call(this);
+				}
+				else if (this.buttonpress == 5) {
+					punch.call(this);
+					this.buttonpress = 0;
+				}
+				else if (this.buttonpress == 10) {
+					kick.call(this);
+					this.buttonpress = 0;
+				}
+
+				if (this.buttonpress == 9 && this.jump == 0) {
+					idlefighter.call(this);
+					this.buttonpress = 0;
+				}
+
+			}
+		}
+
+		/*
+		15 - 68 - right
+		14 - 65 - left 
+		13 - 83 - down
+		12 - 87 - up
+		*/
+
+		function controllercheckbutton(m) {
+
+			//console.log(m.axes[0])
+
+			var fakepress = false;
+			var sensitivityY = 0.8;
+			var sensitivityX = 0.8;
+
+			for (var g = 0; g < 16; g++) {
+				fakepress = false;
+
+				if (g > 11) {
+					if (this.jump !==0) {
+						sensitivityX = 0.5;
+					}
+					if (g == 12 && m.axes[1] <= -0.45 && this.jump==0 && pausedgame==0) {
+						fakepress = true;
+					}
+					if (g == 13 && m.axes[1] >= sensitivityY) {
+						fakepress = true;
+					}
+					if (g == 14 && m.axes[0] <= -sensitivityX) {
+						fakepress = true;
+					}
+					if (g == 15 && m.axes[0] >= sensitivityX) {
+						fakepress = true;
+					}
+				}
+				//console.log(sensitivity)
+				if (this.controllertimer > 6) {
+
+					
+
+					if (m.buttons[g].pressed == true || fakepress==true) {
+						this.controllertimer = 0;
+						if (fakepress == true) {
+							//this.controllertimer = 2;
+						}
+						var e = { keyCode: buttonkeys[g] };
+						keysDown.call(this, e);
+						this.previouspadbutton[g] = buttonkeys[g];
+					}
+				}
+				if (this.previouspadbutton[g] == buttonkeys[g]) {
+					if (m.buttons[g].pressed == false && fakepress==false) {
+						var e = { keyCode: buttonkeys[g] };
+						keysUp.call(this, e);
+						this.previouspadbutton[g] = 0;
+					}
+				}
+			}
+		}
+
+		function waitingforplay() {
+
+
+		}
+
+		var presstimer=0;
+
+		function drawbars() {
+
+			/*
+			ctx.fillStyle = "white";
+			ctx.font = (40) + "px Arial";
+			ctx.fillText(fighters[0].health, 50, 50);
+
+			ctx.fillStyle = "white";
+			ctx.font = (30) + "px Arial";
+			ctx.fillText(fighters[0].specialmeter, 60, 100);
+
+			ctx.fillStyle = "white";
+			ctx.font = (40) + "px Arial";
+			ctx.fillText(fighters[1].health, 1400, 50);
+
+			ctx.fillStyle = "white";
+			ctx.font = (30) + "px Arial";
+			ctx.fillText(fighters[1].specialmeter, 1410, 100);
+			*/
+
+			presstimer++;
+
+			if (presstimer > 120) {
+				presstimer = 0;
+			}
+
+			if (ai[0].aimode !== 99 && presstimer < 61) {
+				ctx.fillStyle = "orange";
+				ctx.font = (40) + "px Arial";
+				ctx.fillText("press start", 100, 150);
+			}
+
+			if (ai[1].aimode !== 99 && presstimer < 65) {
+				ctx.fillStyle = "orange";
+				ctx.font = (40) + "px Arial";
+				ctx.fillText("press start", 1200, 150);
+			}
+
+			var y;
+
+			y = Math.floor(fighters[0].specialmeter / 150);
+
+			ctx.drawImage(redbar, 50, 50, 600, 50);
+			if (fighters[0].health > 0) { ctx.drawImage(greenbar, 50, 50, fighters[0].health * 3, 50); }
+
+			for (x = 0; x <= y; x++) {
+				if (x > 2) {
+					continue;
+				}
+				ctx.drawImage(blackbar, 45 + 150*1.2 + (x * 150*1.2), 100, 10, 25);
+			}
+
+			v = fighters[0].specialmeter * 1.2;
+			if (v > 600) { v = 600; }
+			ctx.drawImage(bluebar, 50, 100, v, 25);
+
+
+			if (fighters[0].specialmeter > 149) {
+				for (x = 0; x < y; x++) {
+					if (x > 3) {
+						continue;
+					}
+					ctx.drawImage(brightbluebar, 50 + (150 * x), 100, 150 * 1.2, 25);
+				}
+			}
+
+			if (fighters[0].wins > 0) {
+				ctx.drawImage(yellowcircle, 50, 130, 25, 25);
+			}
+
+			if (fighters[0].wins == 2) {
+				ctx.drawImage(yellowcircle, 75, 130, 25, 25);
+			}
+
+
+			y = Math.floor(fighters[1].specialmeter / 150);
+
+			ctx.drawImage(redbar, 850, 50, 600, 50);
+			if (fighters[1].health > 0) { ctx.drawImage(greenbar, 850, 50, fighters[1].health * 3, 50);
+		}
+
+
+			for (x = 0; x <= y; x++) {
+				if (x > 2) {
+					continue;
+				}
+				ctx.drawImage(blackbar, 845 + 150*1.2 + (x * 150*1.2), 100, 10, 25);
+			}
+			ctx.drawImage(bluebar, 850, 100, fighters[1].specialmeter * 1.2, 25);
+
+			if (fighters[1].specialmeter > 149) {
+				for (x = 0; x < y; x++) {
+					if (x > 3) {
+						continue;
+					}
+					ctx.drawImage(brightbluebar, 850 + (150 * x), 100, 150 * 1.2, 25);
+				}
+			}
+
+			if (fighters[1].wins > 0) {
+				ctx.drawImage(yellowcircle, 1425, 130, 25, 25);
+			}
+
+			if (fighters[1].wins == 2) {
+				ctx.drawImage(yellowcircle, 1400, 130, 25, 25);
+			}
+
+		}
+
+		function drawwinscreen() {
+			ctx.drawImage(ryuwinscreen, 0, 0, 1500, 800)
+		}
+
+		function drawlosescreen() {
+			ctx.drawImage(ryulosescreen, 0, 0, 1500, 800)
+		}
+
+		function checkhealth() {
+
+			if (youwin !== 0) {
+				return;
+			}
+
+			if (fighters[0].health < 1) {
+
+				youwin = -1;
+
+			}
+
+			if (fighters[1].health < 1) {
+
+				youwin = 1;
+
+			}
+
+		}
+
+		function initpositions() {
+
+			fighters[0].xpos = 100;
+			fighters[0].ypos = 450;
+			fighters[1].xpos = 1000;
+			fighters[1].ypos = 450;
+			fighters[0].health = 200;
+			fighters[1].health = 200;
+			idlefighter.call(fighters[0]);
+			idlefighter.call(fighters[1]);
+			projectiles = [];
+			fighters[0].directionfacing = 0;
+			fighters[1].directionfacing = 1;
+			
+
+			initvalues.call(fighters[0]);
+			initvalues.call(fighters[1]);
+
+
+		}
+
+		function initvalues() {
+
+			this.combo = 0;
+			this.animation = 0;
+			this.animationtiming = 10;
+			this.animationtimer = 0;
+			this.crouch = 0;
+			this.jump = 0;
+			this.punch = 0;
+			this.movement = 0;
+			this.animationreverse = 1;
+			this.spritesheet = 0;
+			this.spritecorrection = 0;
+			this.spritecorrectionsize = 0;
+			this.jump = 0;
+			this.animationbeingused = 5;
+			this.hit = 0;
+			this.combohitted = 0;
+			this.stuncounter = 0;
+			this.stunned = 0;
+			this.punchtimer = 0;
+			this.specialtimer = 0;
+			this.combohittimer = 0;
+			this.flairflop = 0;
+			this.blocking = 0;
+			this.jumpheight = 0;
+			this.score = 0;
+			this.health = 200;
+			this.unblockablespecial = 0;
+			this.spins = 0;
+			this.specialspinkick = 0;
+			this.specialfireballs = 0;
+
+		}
+
+		function startupshor() {
+			if (this.jump == 0) {
+				haduksfx.muted = false;
+				gamestartfx.play(); 
+				this.specialtimer = 10;
+				shoryuken.call(this);
+				fighters[0].specialmeter = 0;
+				fighters[1].specialmeter = 0;
+				gamestart = 2;
+			}
+		}
+
+		function specialfire() {
+
+			if (this.specialfireballs > 0) {
+
+				this.specialfireballs--;
+				//console.log(this.specialfireballs);
+				this.specialtimer = 1;
+				projectfighter.call(this);
+
+			}
+
+		}
+
+		function spinmoves() {
+
+			if (this.spins == 0) {
+				return;
+			}
+
+
+			if (this.specialspinkick > 0 && this.spins == 5) {
+				this.specialspinkick--;
+				this.specialtimer = 1;
+				this.spins = 1
+				spinkick.call(this);
+			}
+
+			//console.log(this.directionjump);
+
+			if (this.directionjump == 1) {
+				movefighter.call(this, -1);
+			}
+			if (this.directionjump == 0) {
+				movefighter.call(this, 1);
+			}
+
+		}
+
+		function checkblock() {
+
+			if (this.directionfacing == 1 && this.leftkeydown == true && this.rightkeydown == false) {
+				this.blocking = 0
+			}
+			if (this.directionfacing == 0 && this.leftkeydown == false && this.rightkeydown == true) {
+				this.blocking = 0;
+			}
+			if (this.leftkeydown == false && this.rightkeydown == false) {
+				this.blocking = 0;
+			}
+
+			if (this.spins !== 0 || this.specialfireballs !== 0 || this.stunned == 1 || this.stuncounter < 0 || this.jump !== 0) {
+				return;
+			}
+
+			if (this.directionfacing == 0 && this.leftkeydown == true && this.rightkeydown == false && this.punch == 0) {
+				this.blocking = 1;
+				return;
+			}
+			else {
+				this.blocking = 0;
+			}
+			if (this.directionfacing == 1 && this.leftkeydown == false && this.rightkeydown == true && this.punch == 0) {
+				this.blocking = 1;
+			}
+			else {
+				this.blocking = 0;
+			}
+
+		}
+
+		function block() {
+
+			if (this.stunned == 0 && this.stuncounter>0) {
+				//blocksfx.play();
+				var snd = new Audio("sfx/2BH (2).mp3");
+				snd.play();
+
+			}
+			this.stunned = 1;
+			this.stuncounter = -15;
+			this.spritesheet = this.spriteycoordinates[8];
+			this.spritecorrection = this.spritecorrections[8];
+			this.spritecorrectionsize = this.spritecorrectionsizes[8];
+			this.animationreverse = 1;
+			this.animation = 3;
+			this.animationtimer = 0;
+			this.animationtiming = this.animationtimingsneeded[8];
+			this.punch = 0;
+			this.directionjump = this.directionfacing;
+			this.movement = this.directionfacing;
+		}
+
+		function timers() {
+
+
+			this.punchtimer++;
+			this.stuncounter++;
+			this.specialtimer++;
+			this.combohittimer++;
+
+			if (this.combohittimer > 0) {
+				this.combohitted = 0;
+				this.flairflop = 0;
+			}
+
+			if (this.stuncounter > 0 && this.stunned == 1) {
+				this.stunned = 0;
+				idlefighter.call(this);
+			}
+
+		}
+
+		function checkprojectiles() {
+			if (projectiles.length > 0) {
+				for (let z = 0; z < projectiles.length; z++) {
+					projectilemove.call(projectiles[z]); /// looop for all projectiles
+					var q = checkcollidefire(projectiles[z], fighters[0], fighters[1]);
+					var w = checkcollidefire(projectiles[z], fighters[1], fighters[0]);
+					var v = checkcollideotherfire(projectiles[z], z);
+					if (q == true) {
+						projectiles.splice(z, 1);
+						if (z !== projectiles.length - 1) { z--; }
+					}
+					else if (w == true) {
+						projectiles.splice(z, 1);
+						if (z !== projectiles.length - 1) { z--; }
+					}
+					else if (v !== -1) {
+						projectiles.splice(z, 1);
+						projectiles.splice(v - 1, 1);
+						if (z !== projectiles.length - 1) { z--; }
+					}
+					else if (projectiles[z].xpos > 1500 || projectiles[z].xpos < 0) {
+						projectiles.splice(z, 1);
+						if (z !== projectiles.length - 1) { z--; }
+					}///unload from array and minus the z--
+				}
+			}
+		}
+
+		function checkcollideotherfire(m, n) {
+
+			for (let r = 0; r < projectiles.length; r++) {
+				if (r == n) { continue; }
+				if (projectiles[r].player == m.player) {
+					continue;
+				}
+
+				let z = projectiles[r].xpos - m.xpos;
+
+
+				if (z < 0) {
+					z *= -1;
+				}
+
+				var y = projectiles[r].ypos - m.ypos;
+
+				if (y < 0) {
+					y *= -1;
+				}
+
+
+				if (m.directionfacing == 0) {
+					if (z < 20 && y < 100) {
+						return r;
+					}
+				}
+				if (m.directionfacing == 1) {
+					if (z < 180 && y < 100) {
+
+						return r;
+					}
+				}
+			}
+
+			return -1;
+
+		}
+
+		function checkflop() {
+			if (this.flairflop == 0) {
+				return;
+			}
+
+
+			this.stunned = 0;
+			if (this.directionfacing == 0) {
+				movefighter.call(this, -1.5);
+			} else if (this.directionfacing == 1) {
+				movefighter.call(this, 1.5);
+			}
+			this.stunned = 1;
+		}
+
+		function flairflop() {
+
+
+			var snd = new Audio("sfx/hit sound 2.wav");
+			snd.play();
+			this.combohittimer = -80;
+			this.hit = 1;
+			this.stunned = 1;
+			this.stuncounter = -80;
+			this.spritesheet = this.spriteycoordinates[7];
+			this.spritecorrection = this.spritecorrections[7];
+			this.spritecorrectionsize = this.spritecorrectionsizes[7];
+			this.animationreverse = 1;
+			this.animation = 1;
+			this.animationtimer = 0;
+			this.animationtiming = this.animationtimingsneeded[7];
+			this.punch = 0;
+			this.directionjump = this.directionfacing;
+			this.flairflop = 1;
+			this.movement = this.directionfacing;
+			this.jump = 1;
+			this.specialfireballs = 0;
+			this.spins = 0;
+			this.specialspinkick = 0;
+			if (this.ypos > 360) { this.jumpheight = 300; }
+
+
+			//badlyhitsfx.play();
+			var sndd = new Audio("sfx/1.mp3");
+			sndd.play();
+
+		}
+
+		function hit() {
+
+			if (this.stunned == 1) {
+				return;
+			}
+
+			if (this.blocking == 1) {
+
+				block.call(this);
+				return;
+			}
+
+			this.combohitted++;
+			if (this.combohitted == 3) {
+				flairflop.call(this);
+				this.health -= 6;
+				return;
+			}
+			this.combohittimer = -240;
+			this.hit = 1;
+			this.stunned = 1;
+			this.stuncounter = -15;
+			this.movement = 0;
+			this.spritesheet = this.spriteycoordinates[6];
+			this.spritecorrection = this.spritecorrections[6];
+			this.spritecorrectionsize = this.spritecorrectionsizes[6];
+			this.animationreverse = 1;
+			this.animation = 1;
+			this.animationtimer = 0;
+			this.animationtiming = this.animationtimingsneeded[6];
+			this.punch = 0;
+			this.directionjump = this.directionfacing;
+			this.health--;
+			this.health--;
+			this.specialtimer + 60;
+			this.specialmeter += 5;
+			this.specialfireballs = 0;
+			this.spins = 0;
+			this.specialspinkick = 0;
+			if (fighters[0] !== this) {
+				fighters[0].specialmeter += 5;
+			}
+			if (fighters[1] !== this) {
+				fighters[1].specialmeter += 5;
+			}
+
+			//hitsfx.play();
+			var snd = new Audio("sfx/hit sound 2.wav");
+			snd.play();
+
+		}
+
+		function checkcollidefire(f, m, n) {
+
+			if (f.player == m.player) {
+				return false;
+			}
+
+			let z = f.xpos - m.xpos;
+
+
+			if (z < 0) {
+				z *= -1;
+			}
+
+			var y = f.ypos - m.ypos;
+
+			if (y < 0) {
+				y *= -1;
+			}
+
+
+			if (f.directionfacing == 0) {
+				if (z < 20 && y < 200 && m.crouch == 0) {
+					if (m.blocking == 0 && m.stunned == 0) {
+						m.health -= 4;
+						m.specialmeter += 5;
+						n.specialmeter += 10;
+					}
+					hit.call(m);
+					//if (m.blocking == 1 && m.health>10) { m.health -= 1; }
+					return true;
+				}
+			}
+			if (f.directionfacing == 1) {
+				if (z < 180 && y < 200 && m.crouch == 0) {
+
+					hit.call(m);
+					if (m.blocking == 0 && m.stunned == 0) {
+						m.health -= 4;
+						m.specialmeter += 5;
+						n.specialmeter += 10;
+					}
+					//if (m.blocking == 1 && m.health > 10) { m.health -= 1; }
+					return true;
+				}
+			}
+
+			return false;
+
+		}
+
+
+		function checkpunch(m, n) {
+
+			if (m.stunned == 1) {
+				return;
+			}
+
+			if (m.punch == 0) {
+				return;
+			}
+
+			if (n.crouch == 1 && m.crouch == 0) {
+				return;
+			}
+
+			var z = m.xpos - n.xpos;
+
+			if (z < 0) {
+				z *= -1;
+			}
+			var y = m.ypos - n.ypos;
+
+			if (y < 0) {
+				y *= -1;
+			}
+
+
+			if (m.directionfacing == 0) {
+				if (z < 220 && y < 150) {
+					hit.call(n);
+				}
+			}
+			if (m.directionfacing == 1) {
+				if (z < 190 && y < 150) {
+					hit.call(n);
+				}
+			}
+
+		}
+
+		function jumping() {
+
+			this.ypos -= 6 * this.jump;
+
+			if (this.ypos < 6 && gamestart==7) {
+				this.ypos = 0;
+				this.jump = -1;
+			}
+
+
+
+			if (this.jump == 1 && this.ypos == this.jumpheight) {
+
+				if (this.spins == 0) {
+					this.jump = -1;
+				}
+				else {
+					this.ypos += 6 * this.jump;
+				}
+			}
+			if (this.jump == -1 && this.ypos == 450) {
+				this.jump = 0;
+				if (this.spins == 0) { idlefighter.call(this); }
+				if (buttonpress !== 2 || buttonpress !== 1) { buttonpress = 0; }
+			}
+
+		}
+
+		function checkcollideeachother(m, n) {
+
+			var z = m.xpos - n.xpos;
+
+			if (z < 0) { z *= -1; }
+
+			if (z < 150) {
+				if (m.jump == 0 && n.jump == 0 && m.directionfacing == 0) {
+					m.flairflop = 1;
+					movefighter.call(m, -2);//m.xpos = m.xpos -= 3 * m.movement;
+					m.flairflop = 0;
+					n.flairflop = 1;
+					movefighter.call(n, 0.5);//m.xpos = m.xpos -= 3 * m.movement;
+					n.flairflop = 0;
+				}
+				if (m.jump == 0 && n.jump == 0 && m.directionfacing == 1) {
+					m.flairflop = 1;
+					movefighter.call(m, 2);//m.xpos = m.xpos -= 3 * m.movement;
+					m.flairflop = 0;
+					n.flairflop = 1;
+					movefighter.call(n, -0.5);//m.xpos = m.xpos -= 3 * m.movement;
+					n.flairflop = 0;
+				}
+
+			}
+			if (z < 120) {
+
+				if (m.jump == 0 && n.jump == 0 && m.directionfacing == 1) {
+					movefighter.call(m, -1);//m.xpos = m.xpos -= 3 * m.movement;
+				}
+			}
+
+			if (z < 150 && m.directionjump == 0 && m.jump == -1) {
+				if (m.jump == -1 && n.jump == 0 && m.ypos > 250) {
+					movefighter.call(m, 1);//m.xpos = m.xpos += 3 * m.movement;
+
+					if (m.directionjump == 0) {
+						movefighter.call(m, 6);//m.xpos = m.xpos += 20;
+					}
+
+					m.ypos += 6 * m.jump;
+					m.animationtimer = 0;
+				}
+
+			}
+
+			if (m.xpos > 1200 && n.xpos > m.xpos) {
+
+				if (m.spins == 0) { m.directionjump = 1; }
+			}
+			if (m.xpos < 20 && n.xpos < m.xpos) {
+
+				if (m.spins == 0) { m.directionjump = 0; }
+			}
+
+			if (z < 120 && m.directionjump == 1 && m.jump == -1 && m.ypos > 250) {
+				if (m.jump == -1 && n.jump == 0 && m.ypos > 250) {
+					movefighter.call(m, 1);//m.xpos = m.xpos += 3 * m.movement;
+				}
+				if (m.directionjump == 1) {
+					movefighter.call(m, -6);//m.xpos = m.xpos -= 20;
+				}
+			}
+
+			if (z < 145) {
+				if (m.jump == 0 && n.jump == 0 && m.directionfacing == 0) {
+					movefighter.call(m, -4);//m.xpos = m.xpos -= 6;
+				}
+			}
+			if (z < 125) {
+				if (m.jump == 0 && n.jump == 0 && m.directionfacing == 1) {
+					movefighter.call(m, 4);//m.xpos = m.xpos += 6;
+				}
+			}
+
+			pushbackintoplay.call(m);
+
+		}
+
+		function checkdirectionfacing() {
+
+			if (fighters[0].xpos < fighters[1].xpos) {
+				fighters[0].directionfacing = 0;
+				fighters[1].directionfacing = 1;
+			}
+			else if (fighters[1].xpos < fighters[0].xpos) {
+				fighters[0].directionfacing = 1;
+				fighters[1].directionfacing = 0;
+			}
+
+		}
+
+		function drawfighter() {
+
+			if (this.directionfacing == 0) {
+				ctx.drawImage(this.sprites, this.spritecorrection + 36 + 75 * (this.animation), 120 + 100 * (this.spritesheet), 75 + this.spritecorrectionsize, 100, this.xpos, this.ypos, 200 + this.spritecorrectionsize, 300);
+			}
+			if (this.directionfacing == 1) {
+				ctx.translate(75 + this.spritecorrectionsize + this.xpos, this.ypos);
+				ctx.scale(-1, 1);
+				ctx.drawImage(this.sprites, this.spritecorrection + 36 + 75 * (this.animation), 120 + 100 * (this.spritesheet), 75 + this.spritecorrectionsize, 100, 0 - 100, 0, 200 + this.spritecorrectionsize, 300);
+				ctx.setTransform(1, 0, 0, 1, 0, 0);
+			}
+
+		}
+
+		function fun() {
+
+			if (Math.random() * 100 < 5) { smalljumpfighter.call(fighters[0], 1); }
+
+			haduksfx.muted = true;
+			projectfighter.call(fighters[0], 1);
+			fighters[0].specialtimer = 1;
+			fighters[0].specialmeter = 0;
+			fighters[1].specialmeter = 0;
+			fighters[0].xpos = 100;
+
+			if (Math.random() * 100 > 5) { projectiles.push(new projectile(fighters[0])); }
+		}
+
+		function uppercut() {
+
+
+			this.spritesheet = 19.5;//this.spriteycoordinates[9];
+			this.spritecorrection = -20;//this.spritecorrections[9];
+			this.spritecorrectionsize = this.spritecorrectionsizes[9];
+			this.animation = 6;
+			this.animationtimer = 0;
+			this.animationreverse = 1;
+			this.animationtiming = this.animationtimingsneeded[9];
+			this.punch = 1;
+			this.punchtimer = -40;
+
+			//punchexhalesfx.play();
+			//punchswingsfx.play();
+			var snd = new Audio("sfx/punch swing.mp3");
+			var sndd = new Audio("sfx/9.mp3");
+			snd.play();
+			sndd.play();
+		}
+
+		function punch() {
+
+			if (this.stunned == 1) {
+				return;
+			}
+
+
+			if (this.punch == 0 && this.punchtimer > 0) {
+
+				if (this.crouch == 1) {
+					//kick.call(this);
+					uppercut.call(this);
+					return;
+				}
+				this.spritesheet = this.spriteycoordinates[5];
+				this.spritecorrection = this.spritecorrections[5];
+				this.spritecorrectionsize = this.spritecorrectionsizes[5];
+				this.animation = 2;
+				this.animationtimer = 0;
+				this.animationreverse = 1;
+				this.animationtiming = this.animationtimingsneeded[5];
+				this.punch = 1;
+				this.punchtimer = -40;
+
+				//punchexhalesfx.play();
+				//punchswingsfx.play();
+				var snd = new Audio("sfx/punch swing.mp3");
+				var sndd = new Audio("sfx/9.mp3");
+				snd.play();
+				sndd.play();
+
+			}
+
+		}
+
+		function duckkick() {
+
+
+			this.spritesheet = 12.35;//this.spriteycoordinates11];
+			this.spritecorrection = -80;//this.spritecorrections[9];
+			this.spritecorrectionsize = 50//this.spritecorrectionsizes[9];
+			this.animation = 3;
+			this.animationtimer = 0;
+			this.animationreverse = 1;
+			this.animationtiming = 15//this.animationtimingsneeded[9];
+			this.punch = 1;
+			this.punchtimer = -40;
+
+			//punchexhalesfx.play();
+			//punchswingsfx.play();
+			var snd = new Audio("sfx/punch swing.mp3");
+			var sndd = new Audio("sfx/9.mp3");
+			snd.play();
+			sndd.play();
+
+		}
+
+		function kick() {
+
+			if (this.stunned == 1) {
+				return;
+			}
+
+
+			if (this.punch == 0 && this.punchtimer > 0) {
+
+				if (this.crouch == 1) {
+					duckkick.call(this);
+					return;
+				}
+				this.spritesheet = 10.4;//this.spriteycoordinates[10];
+				this.spritecorrection = -40//this.spritecorrections[10];
+				this.spritecorrectionsize = 40//this.spritecorrectionsizes[10];
+				this.animation = 0;
+				this.animationtimer = 0;
+				this.animationreverse = 1;
+				this.animationtiming = 15;//this.animationtimingsneeded[10];
+				this.punch = 1;
+				this.punchtimer = -40;
+
+				//punchexhalesfx.play();
+				//punchswingsfx.play();
+				var snd = new Audio("sfx/punch swing.mp3");
+				var sndd = new Audio("sfx/9.mp3");
+				snd.play();
+				sndd.play();
+
+			}
+
+		}
+
+		function shoryuken() {
+
+			if (this.specialtimer < 0 && this.jump == 0) {
+				return;
+			}
+
+
+			smalljumpfighter.call(this);
+			this.spritesheet = 20.7;//this.spriteycoordinates[12];
+			this.spritecorrection = -20//this.spritecorrections[10];
+			this.spritecorrectionsize = 0//this.spritecorrectionsizes[10];
+			this.animation = 3;
+			this.animationtimer = 0;
+			this.animationreverse = -1;
+			this.animationtiming = 10;//this.animationtimingsneeded[10];
+			this.punch = 1;
+			this.punchtimer = -10;
+			this.specialtimer = -130;
+			this.spins = -1;
+			this.directionjump = this.directionfacing;
+			this.specialmeter += 10;
+
+			var snd = new Audio("sfx/shore.mp3");
+			snd.play()
+
+		}
+
+		function spinkick() {
+
+			if (this.specialtimer < 0) {
+				return;
+			}
+
+			this.spritesheet = 18;//this.spriteycoordinates[12];
+			this.spritecorrection = 0//this.spritecorrections[10];
+			this.spritecorrectionsize = 20//this.spritecorrectionsizes[10];
+			this.animation = 0;
+			this.animationtimer = 0;
+			this.animationreverse = 1;
+			this.animationtiming = 4;//this.animationtimingsneeded[10];
+			this.punch = 1;
+			this.punchtimer = -10;
+			this.specialtimer = -180;
+			this.specialmeter += 10;
+
+			if (this.spins == 0) { this.directionjump = this.directionfacing; }
+			this.spins = 1;
+
+			var snd = new Audio("sfx/9.mp3");
+			var sndd = new Audio("sfx/7.mp3");
+			snd.play()
+			sndd.play()
+		}
+
+		function combomove() {
+
+			this.combotimer++;
+
+			if (this.stunned == 1) {
+				this.combokeynumber = 0;
+				this.combotimer = 0;
+				return;
+			}
+
+			const combotimeneeded = 20;
+
+			if (this.combotimer > combotimeneeded) {
+				this.combokeynumber = 0;
+			}
+
+			//if (this == fighters[1]) { console.log(this.combokeynumber); }
+
+			if (this.keypressed == 83 && this.combokeynumber == 0) {
+				this.combotimer = 0;
+				this.combokeynumber = 1;
+				this.keypressed = 0;
+				//console.log("HEY")
+			}
+
+
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 68 && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 2;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 65 && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 2;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+			if (this.keypressed == 188 && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
+				buttonpress = 0;
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				projectfighter.call(this);
+				this.keypressed = 0;
+			}
+
+
+
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 83 && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 11;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 68) && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 83 && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 11;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 68) && this.combokeynumber == 2 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 68 && this.combokeynumber == 11 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 12;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 11 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 65 && this.combokeynumber == 11 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 12;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 11 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+
+			if (this.keypressed == 188 && this.combokeynumber == 12 && this.combotimer < combotimeneeded && this.specialtimer > 0 && this.specialmeter > 149) {
+				buttonpress = 0;
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				//	if (this.jump == 0) {
+				//	smalljumpfighter.call(this);
+				//	}
+				this.specialmeter -= 150;
+				this.specialfireballs = 100;
+				projectfighter.call(this);
+				this.specialtimer = -120;
+				this.keypressed = 0;
+			}
+
+
+
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 65 && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 3;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 83 && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 4;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 68) && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 68 && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 3;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 83) && this.combokeynumber == 1 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 83 && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 4;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 65) && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.keypressed == 190 && this.combokeynumber == 3 && this.combotimer < combotimeneeded) {
+				buttonpress = 0;
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				if (this.jump == 0 && this.specialtimer > 0) {
+					smalljumpfighter.call(this);
+				}
+				spinkick.call(this);
+				this.keypressed = 0;
+			}
+
+
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 68 && this.combokeynumber == 4 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 5;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 65 || this.keypressed == 83) && this.combokeynumber == 4 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+				}
+			}
+
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 65 && this.combokeynumber == 4 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 5;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 68 || this.keypressed == 83) && this.combokeynumber == 4 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.keypressed == 190 && this.combokeynumber == 5 && this.combotimer < combotimeneeded && this.specialmeter > 149) {
+				buttonpress = 0;
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				if (this.jump == 0 && this.specialtimer > 0) {
+					smalljumpfighter.call(this);
+				}
+				this.specialmeter -= 150;
+				this.specialspinkick = 2;
+				spinkick.call(this);
+				this.keypressed = 0;
+			}
+
+
+
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 68 && this.combokeynumber == 0) {
+					this.combotimer = 0;
+					this.combokeynumber = 21;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 65 && this.combokeynumber == 0) {
+					this.combotimer = 0;
+					this.combokeynumber = 21;
+					this.keypressed = 0;
+				}
+			}
+
+			//console.log(this.combokeynumber);
+
+			if (this.keypressed == 83 && this.combokeynumber == 21 && this.combotimer < combotimeneeded) {
+				this.combotimer = 0;
+				this.combokeynumber = 22;
+				this.keypressed = 0;
+			}
+			else if ((this.keypressed == 87 || this.keypressed == 65 || this.keypressed == 68) && this.combokeynumber == 21 && this.combotimer < combotimeneeded) {
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				this.keypressed = 0;
+			}
+
+			if (this.directionfacing == 0) {
+				if (this.keypressed == 68 && this.combokeynumber == 22 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 23;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 65 || this.keypressed == 83) && this.combokeynumber == 22 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.directionfacing == 1) {
+				if (this.keypressed == 65 && this.combokeynumber == 22 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 23;
+					this.keypressed = 0;
+				}
+				else if ((this.keypressed == 87 || this.keypressed == 68 || this.keypressed == 83) && this.combokeynumber == 22 && this.combotimer < combotimeneeded) {
+					this.combotimer = 0;
+					this.combokeynumber = 0;
+					this.keypressed = 0;
+				}
+			}
+
+			if (this.keypressed == 188 && this.combokeynumber == 23 && this.combotimer < combotimeneeded && this.jump == 0) {
+				this.combotimer = 0;
+				this.combokeynumber = 0;
+				this.keypressed = 0;
+				shoryuken.call(this);
+			}
+
+
+
+
+
+		}
+
+		function crouchfighter() {
+
+			if (this.stunned == 1 || this.jump !== 0) {
+				return;
+			}
+			this.spritesheet = this.spriteycoordinates[1];
+			this.spritecorrection = this.spritecorrections[1];
+			this.spritecorrectionsize = this.spritecorrectionsizes[1];
+			this.animation = 7;
+			this.animationtimer = 0;
+			this.animationreverse = 1;
+			this.animationtiming = this.animationtimingsneeded[1];
+			moveleftright = 0;
+			this.crouch = 1;
+		}
+
+		function projectfighter(m) {
+
+			if (this.specialtimer < 0) {
+				return;
+			}
+
+			if (this.stunned == 1) {
+				return;
+			}
+
+			projectiles.push(new projectile(this));
+			this.spritesheet = this.spriteycoordinates[4];
+			this.spritecorrection = this.spritecorrections[4];
+			this.spritecorrectionsize = this.spritecorrectionsizes[4];
+			this.animation = 5;
+			this.animationtimer = 0;
+			this.animationreverse = 1;
+			this.animationtiming = this.animationtimingsneeded[4];
+			this.specialtimer = -40;
+			if (this.specialfireballs == 0) {
+				this.specialmeter += 10;
+			}
+
+
+			if (m == undefined) {
+				var s = new Audio("sfx/5.mp3");
+				s.play();
+			}
+		}
+
+		function projectilemove() {
+
+			if (this.directionfacing == 0) {
+				this.xpos += 5;
+			}
+			else {
+				this.xpos -= 5;
+			}
+
+			this.animationtimer++;
+
+			if (this.animationtimer == 10) {
+				this.animationtimer = 0;
+				this.animation++;
+			}
+
+			if (this.animation == 3) {
+				this.animation = 0;
+			}
+
+			if (this.directionfacing == 0) {
+				ctx.drawImage(haduk[this.animation], this.xpos, this.ypos, 100 + Math.random() * 5, 100 + Math.random() * 5)
+			}
+
+			if (this.directionfacing == 1) {
+				ctx.translate(this.xpos, this.ypos);
+				ctx.scale(-1, 1);
+				ctx.drawImage(haduk[this.animation], 0, 0, 100 + Math.random() * 5, 100 + Math.random() * 5);
+				ctx.setTransform(1, 0, 0, 1, 0, 0);
+			}
+		}
+
+		function jumpfighter(m) {
+
+			if (this.jump == 0) {
+				if (this.stunned == 1) {
+					return;
+				}
+				this.spritesheet = this.spriteycoordinates[3];
+				this.spritecorrection = this.spritecorrections[3];
+				this.spritecorrectionsize = this.spritecorrectionsizes[3];
+				this.animationreverse = 1;
+				this.jump = 1;
+				this.animation = 0;
+				this.animationtiming = this.animationtimingsneeded[3];
+				this.directionjump = this.directionfacing;
+				this.jumpheight = 0;
+			}
+		}
+
+		function smalljumpfighter(m) {
+
+			if (this.jump == 0) {
+				if (this.stunned == 1) {
+					return;
+				}
+				this.spritesheet = this.spriteycoordinates[3];
+				this.spritecorrection = this.spritecorrections[3];
+				this.spritecorrectionsize = this.spritecorrectionsizes[3];
+				this.animationreverse = 1;
+				this.jump = 1;
+				this.animation = 0;
+				this.animationtiming = this.animationtimingsneeded[3];
+				this.directionjump = this.directionfacing;
+				this.jumpheight = 300;
+			}
+		}
+
+		function movefighter(m) {
+
+			if (this.stunned == 1 || this.crouch == 1) {
+				return;
+			}
+
+			if (this.jump == 0 && this.punch == 0 && this.spritesheet !== 15.1 && this.flairflop == 0 && this.specialtimer > 0 && this.spritesheet !== 18 && this.spins == 0) {
+				this.movement = 1 * m;
+				this.spritesheet = this.spriteycoordinates[2];
+				this.spritecorrection = this.spritecorrections[2];
+				this.spritecorrectionsize = this.spritecorrectionsizes[2];
+				this.animationtiming = this.animationtimingsneeded[2];
+			}
+			if (this.spritesheet !== 15.1 && this.spins == 0) { this.xpos += 3 * m; }
+
+			if (this.spins > 0) {
+				this.xpos += 3 * m;
+			}
+
+			pushbackintoplay.call(this);
+		}
+
+		function pushbackintoplay() {
+			if (this.xpos > 1310) {
+				this.xpos = 1310;
+			}
+			if (this.xpos < 10) {
+				this.xpos = 10;
+			}
+			if (this.spins > 0 && this.jump!==0) {
+				if (this.xpos > 1255) {
+					this.xpos = 1240;
+				}
+				if (this.xpos < 0) {
+					this.xpos = 40;
+				}
+			}
+		}
+
+		function idlefighter() {
+
+			if (this.stunned == 1) {
+				return;
+			}
+
+			if (this.specialfireballs > 0) {
+				console.log(this.specialfireballs)
+			}
+
+			this.movement = 0;
+			this.spritesheet = this.spriteycoordinates[0];
+			this.spritecorrection = this.spritecorrections[0];
+			this.spritecorrectionsize = this.spritecorrectionsizes[0];
+			this.animation = 0;
+			this.animationtimer = 0;
+			this.animationtiming = this.animationtimingsneeded[0];
+			this.punch = 0;
+			this.directionjump = this.directionfacing;
+			this.crouch = 0;
+			this.spins = 0;
+			this.specialspinkick = 0;
+			this.specialfireballs = 0;
+			if (buttonpress !== 2 || buttonpress !== 1) {
+				moveleftright = 0;
+			}
+		}
+
+		function animation() {
+			this.animationtimer++;
+
+			if (this.animationtimer == this.animationtiming) {
+				this.animationtimer = 0;
+				this.animation += this.animationreverse;
+				if ((this.spritesheet == this.spriteycoordinates[0]) && (this.animation == this.animationbeingused || this.animation == -1)) {
+					this.animationreverse *= -1;
+					this.animation += this.animationreverse;
+					this.animation += this.animationreverse;
+				}
+				if ((this.spritesheet == this.spriteycoordinates[2]) && this.animation == 6) {
+					this.animationreverse *= -1;
+					this.animation += this.animationreverse;
+					this.animation += this.animationreverse;//this.animation = 0;
+				}
+				if ((this.spritesheet == this.spriteycoordinates[2]) && this.animation == -1) {
+					this.animationreverse *= -1;
+					this.animation += this.animationreverse;
+					this.animation += this.animationreverse;//this.animation = 5;
+				}
+				if (this.spritesheet == this.spriteycoordinates[4] && this.animation == 6) {
+
+					idlefighter.call(this);
+				}
+				if (this.spritesheet == this.spriteycoordinates[6] && this.animation == 5) {
+
+					idlefighter.call(this);
+				}
+				if (this.spritesheet == this.spriteycoordinates[9] && this.animation == 7) {
+					if (this.crouch == 1) {
+						idlefighter.call(this);
+						crouchfighter.call(this);
+					} else {
+						idlefighter.call(this);
+					}
+				}
+
+				if (this.spritesheet == this.spriteycoordinates[11] && this.animation == 4) {
+					if (this.crouch == 1) {
+						idlefighter.call(this);
+						crouchfighter.call(this);
+					} else {
+						idlefighter.call(this);
+					}
+				}
+
+				if (this.spritesheet == this.spriteycoordinates[10] && this.animation == 1) {
+
+					idlefighter.call(this);
+				}
+
+				if (this.spritesheet == this.spriteycoordinates[12] && this.animation == 7) {
+					this.animationreverse = -1;
+					this.animation = 5;
+					this.spins++;
+					//idlefighter.call(this);
+				}
+
+				if (this.spritesheet == this.spriteycoordinates[12] && this.animation == 2) {
+
+					if (this.animationreverse == -1 && this.spins == 5) {
+						this.animation = 1;
+						this.spins = 0;
+					}
+					else {
+						this.animation = 3;
+						this.animationreverse = 1;
+					}
+					//idlefighter.call(this);
+				}
+
+				//if (this.spritesheet == this.spriteycoordinates[12] && this.animation == 6) {
+
+				//	if (this.animationreverse == -1) {
+				//		this.animation = 5;
+				//	}
+				//	else {
+				//		this.animation = 6;
+				//	}
+				//}
+
+				if (this.spritesheet == this.spriteycoordinates[12] && this.animation == 4) {
+
+					if (this.animationreverse == -1) {
+						this.animation = 3;
+					}
+					else {
+						this.animation = 5;
+					}
+					//idlefighter.call(this);
+				}
+
+				if (this.spritesheet == this.spriteycoordinates[12] && this.animation == -1) {
+					idlefighter.call(this);
+				}
+
+				//////////////////////
+				//if (this == fighters[1]) {
+				//	console.log(this.animation);
+				//}
+
+
+				if (this.spritesheet == this.spriteycoordinates[13] && this.animation == -1 && this.spins == -2) {
+					this.animationreverse = 1;
+					this.animation = 0;
+					idlefighter.call(this);
+					return;
+					//this.spins--;
+				}
+
+				if (this.spritesheet == this.spriteycoordinates[13] && this.animation == -1) {
+					this.animationreverse = 1;
+					this.animation = 0;
+					//this.spins--;
+				}
+
+				if (this.spritesheet == this.spriteycoordinates[13] && this.animation == 3) {
+					this.animationreverse = -1
+					this.animation = 2;
+					this.spins--;
+					return;
+				}
+
+
+
+				//////////////////////////////
+				/*
+
+				if (this.spritesheet == this.spriteycoordinates[13] && this.animation == 0) {
+					this.animationreverse = 1;
+					this.spins--;
+				}
+
+				if (this.spritesheet == this.spriteycoordinates[13]) {
+
+					console.log(this.animation)
+				}
+
+				if (this.spritesheet == this.spriteycoordinates[13] && this.animation == 3) {
+					this.animationreverse = -1;
+					this.spins--;
+				}
+
+				/*
+				if (this.spritesheet == this.spriteycoordinates[13] && this.animation == 4) {
+
+
+					if (this.animationreverse == 1 && this.spins == -4) {
+						this.animation = -1;
+						this.spins == 0;
+					}
+					else {
+						this.animation = 4;
+						this.animationreverse = -1;
+					}
+				}
+				*/
+				/*
+				if (this.spritesheet == this.spriteycoordinates[13] && this.animation == -1 && this.spins == 0) {
+					idlefighter.call(this);
+				}
+
+				*/
+				/////////////////
+
+				if (this.punch == 1 && this.animation == 3 && this.spritesheet !== this.spriteycoordinates[12]) {
+
+					idlefighter.call(this);
+				}
+
+				if (this.animation == 3 && this.flairflop == 1 && this.spritesheet !== this.spriteycoordinates[12]) {
+					this.animation = 4;
+				}
+				if (this.animation == 5 && this.flairflop == 1 && this.spritesheet !== this.spriteycoordinates[12]) {
+					this.animation = 6;
+				}
+
+			}
+		}
+
+
+		document.addEventListener("keydown", keyDown, false);
+		document.addEventListener("keyup", keyUp, false);
+
+		var leftkeydown = false;
+		var rightkeydown = false;
+
+		function keyUp(e) {
+
+			//console.log(e)
+			//console.log(buttonpress)
+
+			if (e.keyCode == 68) {
+				fighters[0].rightkeydown = false;
+				if (fighters[0].jump == 0 && fighters[0].crouch == 0 && fighters[0].spins == 0 && fighters[0].specialfireballs==0) {
+					idlefighter.call(fighters[0]);
+				}
+			}
+			if (e.keyCode == 65) {
+				fighters[0].leftkeydown = false;
+				if (fighters[0].jump == 0 && fighters[0].crouch == 0 && fighters[0].spins == 0 && fighters[0].specialfireballs == 0) {
+					idlefighter.call(fighters[0]);
+				}
+			}
+			if (e.keyCode == 83) {
+				fighters[0].buttonpress = 6;
+				buttonpresstimer = 60;
+				fighters[0].crouch = 0;
+			}
+		}
+
+
+		function keyDown(e) {
+
+		//	console.log(e)
+		//	console.log(e.keyCode);
+
+			fighters[0].keypressed = e.keyCode;
+
+			//console.log(e)
+			//console.log(e.which);
+			//console.log(e.keyCode);
+			//console.log(buttonpress, moveleftright, e.keyCode)
+
+			if (e.keyCode == 68 || e.which == 68) {
+
+				fighters[0].rightkeydown = true;
+
+			}
+			if (e.keyCode == 65 || e.which == 65) {
+
+				fighters[0].leftkeydown = true;
+			}
+			if (e.keyCode == 87) {
+				fighters[0].buttonpress = 3;
+				buttonpresstimer = 60;
+			}
+			if (e.keyCode == 86) {
+				fighters[0].buttonpress = 8;
+				buttonpresstimer = 60;
+			}
+			if (e.keyCode == 83) {
+				fighters[0].buttonpress = 7;
+				buttonpresstimer = 60;
+			}
+			if (e.keyCode == 190) {
+				fighters[0].buttonpress = 10;
+				buttonpresstimer = 60;
+			}
+			if (e.keyCode == 188) {
+				fighters[0].buttonpress = 5;
+				buttonpresstimer = 60;
+			}
+			if (e.keyCode == 85) {
+				shoryuken.call(fighters[0]);
+			}
+			if (e.keyCode == 49 && fighters[1].ypos == -800) {
+				gamestart = 1;
+			}
+
+				}
+
+
+				function keysUp(e) {
+
+					//console.log(e)
+					//console.log(buttonpress)
+
+					if (e.keyCode == 68) {
+						this.rightkeydown = false;
+						if (this.jump == 0 && this.crouch == 0 && this.spins == 0 && this.specialfireballs == 0) {
+							idlefighter.call(this);
+						}
+					}
+					if (e.keyCode == 65) {
+						this.leftkeydown = false;
+						if (this.jump == 0 && this.crouch == 0 && this.spins == 0 && this.specialfireballs == 0) {
+							idlefighter.call(this);
+						}
+					}
+					if (e.keyCode == 83) {
+						this.buttonpress = 6;
+						this.buttonpresstimer = 60;
+						this.crouch = 0;
+					}
+
+				}
+
+
+				function keysDown(e) {
+
+					//	console.log(e)
+					//	console.log(e.keyCode);
+
+					this.keypressed = e.keyCode;
+
+					//console.log(e)
+					
+
+					//console.log(e)
+					//console.log(e.which);
+					//console.log(e.keyCode);
+					//console.log(buttonpress, moveleftright, e.keyCode)
+
+					if (e.keyCode == 68 || e.which == 68) {
+
+						this.rightkeydown = true;
+
+					}
+					if (e.keyCode == 65 || e.which == 65) {
+
+						this.leftkeydown = true;
+					}
+					if (e.keyCode == 87) {
+						this.buttonpress = 3;
+						buttonpresstimer = 60;
+						//console.log(this.buttonpress)
+					}
+					if (e.keyCode == 86) {
+						this.buttonpress = 8;
+						buttonpresstimer = 60;
+					}
+					if (e.keyCode == 83) {
+						this.buttonpress = 7;
+						buttonpresstimer = 60;
+					}
+					if (e.keyCode == 190) {
+						this.buttonpress = 10;
+						buttonpresstimer = 60;
+					}
+					if (e.keyCode == 188) {
+						this.buttonpress = 5;
+						buttonpresstimer = 60;
+					}
+					if (e.keyCode == 85) {
+						shoryuken.call(this);
+					}
+					if (e.keyCode == 49 && fighters[1].ypos == -800) {
+						gamestart = 1;
+					}
+					
+
+					if (e.keyCode == 49 && pausedgame==1) {
+						gamestart = 0;
+						pausedgame = 0;
+						projectiles = [];
+						ai[0].aimode = 2;
+						ai[1].aimode = 2;
+						theme.currentTime = 105;
+						pushedstart = this.player - 1;
+						fighters[0].specialmeter = 0;
+						fighters[1].specialmeter = 0;
+						fighters[0].directionfacing= 0;
+					}
+
+					if (e.keyCode == 50) {
+
+						if (ai[this.player - 1].aimode == 99 && pausedgame == 0 && gamestart==7) {
+							pausedgame = 1;
+						}
+						else {
+							pausedgame = 0;
+						}
+
+						if (this == fighters[0] && gamestart==0 && fighters[1].ypos == -800) {
+							gamestart = 1;
+						}
+
+						if (gamestart == 0 && this == fighters[1] && fighters[1].ypos == -800) {
+							if (ai[this.player - 1].aimode !== 99) {
+								projectiles = [];
+								ai[this.player - 1].aimode = 99;
+								theme.currentTime = 105;
+								gamestart = 11;
+								pushedstart = this.player - 1;
+								this.ypos = 456;
+								return;
+
+							}
+						}
+						if (gamestart !== 0) {
+							if (ai[this.player - 1].aimode !== 99) {
+								projectiles = [];
+								ai[this.player - 1].aimode = 99;
+								theme.currentTime = 105;
+								gamestart = 11;
+								pushedstart = this.player - 1;
+								if (this.ypos == -800) { this.ypos = 456; }
+								
+
+							}
+						}
+					}
+
+
+				}
+
+		document.addEventListener("touchstart", touchstart);
+
+		document.addEventListener("touchend", touchend);
+
+		function touchend(e) {
+
+		}
+
+
+		function touchstart(e) {
+
+			if (e.touches.length == 3 && fighters[1].ypos == -800) {
+				gamestart = 1;
+			}
+
+			if (e.touches.length == 1) {
+				taptwice++;
+			}
+
+}
+
+		window.addEventListener("gamepadconnected", gamepad);
+
+		
+		function gamepad(e) {
+			var controller;
+			var controllerone;
+
+			controller = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);//navigator.getGamepads();
+
+			controllerone = controller[0];
+		}
+
+
+		//drawFight();
+		setInterval(drawFight, 16);
+
+
+
+	</script>
+</body>
+</html>
