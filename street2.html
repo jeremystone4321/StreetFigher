@@ -1752,7 +1752,7 @@
 			}
 			if (this.jump == -1 && this.ypos == 450) {
 				this.jump = 0;
-				if (this.spins == 0) { idlefighter.call(this); }
+				if (this.spins == 0 && this.specialfireballs==0) { idlefighter.call(this); }
 				if (buttonpress !== 2 || buttonpress !== 1) { buttonpress = 0; }
 			}
 
