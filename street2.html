@@ -1488,9 +1488,11 @@
 					}
 					else if (v !== -1) {
 						projectiles.splice(z, 1);
-						projectiles.splice(v - 1, 1);
+						if (v > z) { projectiles.splice(v-1, 1); }
+						if (z > v) { projectiles.splice(v, 1); }
 						if (z !== projectiles.length - 1) { z--; }
-						continue;
+						checkprojectiles();
+						break;
 					}
 					else if (projectiles[z].xpos > 1500 || projectiles[z].xpos < 0) {
 						projectiles.splice(z, 1);
